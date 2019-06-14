@@ -1,28 +1,22 @@
 package com.sagar.android.chatapp;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 
-import androidx.appcompat.app.AppCompatActivity;
+import com.sagar.android.chatapp.ui.login.Login;
 
-import com.github.nkzawa.emitter.Emitter;
-import com.github.nkzawa.socketio.client.IO;
-import com.github.nkzawa.socketio.client.Socket;
-
-import java.lang.reflect.Array;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private static final String TAG = "sfbdbfgn";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_main);
 
-        try {
+        /*try {
             IO.Options options = new IO.Options();
             options.query = "token=the dummy jwt token here";
             final Socket socket = IO.socket("http://192.168.1.145:3000", options);
@@ -34,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
                         public void call(Object... args) {
                             Log.i(TAG, "socket connected");
 
-                            socket.emit("msg_from_client","Hello server");
+                            socket.emit("msg_from_client", "Hello server");
                         }
                     }
             );
@@ -44,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
                     new Emitter.Listener() {
                         @Override
                         public void call(Object... args) {
-                            Log.i(TAG,"Server : "+ Arrays.toString(args));
+                            Log.i(TAG, "Server : " + Arrays.toString(args));
                         }
                     }
             );
@@ -73,6 +67,21 @@ public class MainActivity extends AppCompatActivity {
         } catch (URISyntaxException e) {
             e.printStackTrace();
             Log.i(TAG, "socket failed : " + e.toString());
-        }
+        }*/
+
+        new Handler().postDelayed(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(
+                                new Intent(
+                                        MainActivity.this,
+                                        Login.class
+                                )
+                        );
+                    }
+                },
+                1000
+        );
     }
 }
