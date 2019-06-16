@@ -1,13 +1,14 @@
 package com.sagar.android.chatapp;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.sagar.android.chatapp.ui.login.Login;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "sfbdbfgn";
 

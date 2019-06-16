@@ -17,5 +17,8 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="noDisplay" parent="Theme.AppCompat.NoActionBar" />
+    <style name="progressBarTheme" parent="AppTheme.NoActionBar">
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
 </resources>
