@@ -44,6 +44,7 @@ public class Repository {
     public MutableLiveData<Result> mutableLiveDataLoginResult;
     public MutableLiveData<Result> mutableLiveDataForgotPasswordResult;
     public MutableLiveData<Result> mutableLiveDataResetPasswordResult;
+    public MutableLiveData<Result> mutableLiveDataLogoutResult;
 
     public Repository(
             ApiInterface apiInterface,
@@ -60,6 +61,7 @@ public class Repository {
         mutableLiveDataLoginResult = new MutableLiveData<>();
         mutableLiveDataForgotPasswordResult = new MutableLiveData<>();
         mutableLiveDataResetPasswordResult = new MutableLiveData<>();
+        mutableLiveDataLogoutResult = new MutableLiveData<>();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,7 +83,7 @@ public class Repository {
 
                             @Override
                             public void onNext(Response<ResponseBody> responseBodyResponse) {
-                                if (responseBodyResponse.code() == 200) {
+                                if (responseBodyResponse.code() == 201) {
                                     try {
                                         saveUserData(
                                                 new Gson().fromJson(
@@ -395,6 +397,101 @@ public class Repository {
                         }
                 );
     }
+
+    public void logout() {
+        apiInterface.logout(
+                getAuthToken()
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 401)
+                                    notAuthorised();
+                                else if (responseBodyResponse.code() == 200) {
+                                    clearAllData();
+                                    mutableLiveDataLogoutResult.postValue(
+                                            new Result(
+                                                    Enums.Result.SUCCESS,
+                                                    ""
+                                            )
+                                    );
+
+                                    new Thread(
+                                            new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    try {
+                                                        Thread.sleep(1000);
+                                                    } catch (InterruptedException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    mutableLiveDataLogoutResult.postValue(null);
+                                                }
+                                            }
+                                    ).start();
+                                } else {
+                                    mutableLiveDataLogoutResult.postValue(
+                                            new Result(
+                                                    Enums.Result.FAIL,
+                                                    getErrorMessage(responseBodyResponse.errorBody())
+                                            )
+                                    );
+
+                                    new Thread(
+                                            new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    try {
+                                                        Thread.sleep(1000);
+                                                    } catch (InterruptedException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    mutableLiveDataLogoutResult.postValue(null);
+                                                }
+                                            }
+                                    ).start();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                mutableLiveDataLogoutResult.postValue(
+                                        new Result(
+                                                Enums.Result.FAIL,
+                                                getErrorMessage(e)
+                                        )
+                                );
+
+                                new Thread(
+                                        new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                mutableLiveDataLogoutResult.postValue(null);
+                                            }
+                                        }
+                                ).start();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -416,6 +513,22 @@ public class Repository {
     private void notAuthorised() {
         clearAllData();
 
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        restartApp();
+                    }
+                }
+        ).start();
+    }
+
+    private void restartApp() {
         Intent intent = new Intent(application, Launcher.class);
         int mPendingIntentId = 123;
         PendingIntent mPendingIntent =

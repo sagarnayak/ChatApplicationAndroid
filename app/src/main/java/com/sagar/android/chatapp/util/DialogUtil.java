@@ -3,9 +3,11 @@ package com.sagar.android.chatapp.util;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.sagar.android.chatapp.R;
@@ -23,6 +25,8 @@ public class DialogUtil {
 
     public interface DialogWithMessageCallBack {
         void dialogCancelled();
+
+        void buttonClicked();
     }
 
     public static void showDialogWithOneButton(
@@ -43,8 +47,18 @@ public class DialogUtil {
         customDialog.getWindow().setLayout(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
         customDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         TextView textViewMessage = customDialog.findViewById(R.id.text_view_message);
+        AppCompatButton buttonAction = customDialog.findViewById(R.id.button_action);
         textViewMessage.setText(message);
         customDialog.setCancelable(cancellable);
+        buttonAction.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dialogWithOneButtonCallBack.buttonClicked();
+                        customDialog.dismiss();
+                    }
+                }
+        );
         customDialog.setOnCancelListener(
                 new DialogInterface.OnCancelListener() {
                     @Override
@@ -72,7 +86,16 @@ public class DialogUtil {
         customDialog.getWindow().setLayout(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
         customDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         TextView textViewMessage = customDialog.findViewById(R.id.text_view_message);
+        AppCompatButton buttonAction = customDialog.findViewById(R.id.button_action);
         textViewMessage.setText(message);
+        buttonAction.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        customDialog.dismiss();
+                    }
+                }
+        );
         customDialog.setCancelable(true);
         customDialog.show();
     }
@@ -95,8 +118,18 @@ public class DialogUtil {
         customDialog.getWindow().setLayout(CoordinatorLayout.LayoutParams.MATCH_PARENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
         customDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         TextView textViewMessage = customDialog.findViewById(R.id.text_view_message);
+        AppCompatButton buttonAction = customDialog.findViewById(R.id.button_action);
         textViewMessage.setText(message);
         customDialog.setCancelable(cancellable);
+        buttonAction.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        callBack.buttonClicked();
+                        customDialog.dismiss();
+                    }
+                }
+        );
         customDialog.setOnCancelListener(
                 new DialogInterface.OnCancelListener() {
                     @Override

@@ -149,6 +149,10 @@ public class Forgotpassword extends AppCompatActivity {
                 new DialogUtil.DialogWithMessageCallBack() {
                     @Override
                     public void dialogCancelled() {
+                    }
+
+                    @Override
+                    public void buttonClicked() {
                         startActivity(
                                 new Intent(
                                         Forgotpassword.this,

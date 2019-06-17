@@ -1,3 +1,9 @@
 <resources>
-    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="paragraphText">14sp</dimen>
+    <dimen name="pageTitle">20sp</dimen>
+    <dimen name="listTitle">14sp</dimen>
+    <dimen name="listItemTitle">16sp</dimen>
+    <dimen name="secondaryText">14sp</dimen>
+    <dimen name="buttonAndTabs">14sp</dimen>
+    <dimen name="textInput">16sp</dimen>
 </resources>

@@ -3,6 +3,7 @@ package com.sagar.android.chatapp.di.component;
 import android.app.Application;
 
 import com.sagar.android.chatapp.application.ApplicationClass;
+import com.sagar.android.chatapp.di.builder.DashboardActivityBuilder;
 import com.sagar.android.chatapp.di.builder.ForgotPasswordActivityBuilder;
 import com.sagar.android.chatapp.di.builder.LauncherActivityBuilder;
 import com.sagar.android.chatapp.di.builder.LoginActivityBuilder;
@@ -32,7 +33,8 @@ import dagger.android.AndroidInjectionModule;
                 SignUpActivityBuilder.class,
                 LoginActivityBuilder.class,
                 ForgotPasswordActivityBuilder.class,
-                ResetPasswordWithOtpActivityBuilder.class
+                ResetPasswordWithOtpActivityBuilder.class,
+                DashboardActivityBuilder.class
         }
 )
 public interface AppComponent {

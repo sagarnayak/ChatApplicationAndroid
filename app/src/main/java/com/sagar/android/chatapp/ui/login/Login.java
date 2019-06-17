@@ -10,6 +10,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.sagar.android.chatapp.BuildConfig;
 import com.sagar.android.chatapp.R;
 import com.sagar.android.chatapp.core.Enums;
 import com.sagar.android.chatapp.databinding.ActivityLoginBinding;
@@ -50,6 +51,11 @@ public class Login extends AppCompatActivity {
                 .get(LoginViewModel.class);
 
         bindToViewModel();
+
+        if (BuildConfig.DEBUG) {
+            binding.contentLogin.editTextUserName.setText("sagarn@gmail.com");
+            binding.contentLogin.editTextPassword.setText("qwerty");
+        }
     }
 
     public void onClickLogin(View view) {

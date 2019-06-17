@@ -138,6 +138,11 @@ public class ResetPasswordWithOtp extends AppCompatActivity {
                 new DialogUtil.DialogWithMessageCallBack() {
                     @Override
                     public void dialogCancelled() {
+
+                    }
+
+                    @Override
+                    public void buttonClicked() {
                         startActivity(
                                 new Intent(ResetPasswordWithOtp.this, Login.class)
                         );
