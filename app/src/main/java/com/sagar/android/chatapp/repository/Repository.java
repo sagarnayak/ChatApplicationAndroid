@@ -566,7 +566,7 @@ public class Repository {
         preferences.edit().clear().apply();
     }
 
-    private UserData getUserData() {
+    public UserData getUserData() {
         try {
             return new Gson().fromJson(
                     preferences.getString(

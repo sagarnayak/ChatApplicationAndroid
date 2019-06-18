@@ -17,6 +17,7 @@ import com.sagar.android.chatapp.databinding.ActivitySignUpBinding;
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.UserSignUpRequest;
 import com.sagar.android.chatapp.ui.dashboard.Dashboard;
+import com.sagar.android.chatapp.ui.login.Login;
 import com.sagar.android.chatapp.util.DialogUtil;
 import com.sagar.android.chatapp.util.ProgressUtil;
 import com.sagar.android.chatapp.util.UiUtil;
@@ -74,7 +75,7 @@ public class SignUp extends AppCompatActivity {
 
     private void backPressed() {
         startActivity(
-                new Intent(this, SignUp.class)
+                new Intent(this, Login.class)
         );
         finish();
     }

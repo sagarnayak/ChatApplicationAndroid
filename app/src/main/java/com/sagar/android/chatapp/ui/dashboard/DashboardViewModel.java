@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.sagar.android.chatapp.model.Result;
+import com.sagar.android.chatapp.model.UserData;
 import com.sagar.android.chatapp.repository.Repository;
 
 public class DashboardViewModel extends ViewModel {
@@ -34,5 +35,9 @@ public class DashboardViewModel extends ViewModel {
 
     public void logout() {
         repository.logout();
+    }
+
+    public UserData getUserData(){
+        return repository.getUserData();
     }
 }

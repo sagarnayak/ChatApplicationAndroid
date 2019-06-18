@@ -27,11 +27,22 @@
             android:layout_width="80dp"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
-            android:background="@color/colorAccent"
+            android:background="@drawable/user_avatar_bg"
             app:layout_constraintBottom_toBottomOf="@+id/appcompatImageViewNavBg"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/textViewUserInitials"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/open_sans_bold"
+            android:textSize="36sp"
+            app:layout_constraintBottom_toBottomOf="@id/appcompatImageViewUserImage"
+            app:layout_constraintEnd_toEndOf="@id/appcompatImageViewUserImage"
+            app:layout_constraintStart_toStartOf="@id/appcompatImageViewUserImage"
+            app:layout_constraintTop_toTopOf="@id/appcompatImageViewUserImage" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/textViewUserName"
@@ -39,7 +50,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:fontFamily="@font/open_sans_semibold"
-            android:text="Sagar Kumar Nayak"
             android:textColor="@android:color/white"
             android:textSize="@dimen/paragraphText"
             app:layout_constraintBottom_toBottomOf="@id/appcompatImageViewUserImage"
@@ -58,6 +68,63 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="@font/open_sans_semibold"
+                    android:onClick="@{context::onClickProfile}"
+                    android:padding="16dp"
+                    android:text="Profile"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/listTitle" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="16dp"
+                    android:background="@color/divider" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="@font/open_sans_semibold"
+                    android:onClick="@{context::onClickChangePassword}"
+                    android:padding="16dp"
+                    android:text="Change Password"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/listTitle" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="16dp"
+                    android:background="@color/divider" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="@font/open_sans_semibold"
+                    android:onClick="@{context::onClickSetting}"
+                    android:padding="16dp"
+                    android:text="Settings"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/listTitle" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="16dp"
+                    android:background="@color/divider" />
 
                 <TextView
                     android:layout_width="match_parent"

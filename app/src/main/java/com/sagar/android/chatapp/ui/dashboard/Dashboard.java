@@ -1,11 +1,14 @@
 package com.sagar.android.chatapp.ui.dashboard;
 
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
@@ -16,6 +19,8 @@ import com.sagar.android.chatapp.core.Enums;
 import com.sagar.android.chatapp.databinding.ActivityDashboardBinding;
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.ui.login.Login;
+import com.sagar.android.chatapp.ui.profile.Profile;
+import com.sagar.android.chatapp.util.ColorUtil;
 import com.sagar.android.chatapp.util.DialogUtil;
 import com.sagar.android.chatapp.util.ProgressUtil;
 
@@ -56,6 +61,8 @@ public class Dashboard extends AppCompatActivity {
                 .get(DashboardViewModel.class);
 
         bindToViewModel();
+
+        setUpUI();
     }
 
     @Override
@@ -71,8 +78,50 @@ public class Dashboard extends AppCompatActivity {
         finish();
     }
 
+    public void onClickProfile(View view) {
+        gotoProfile();
+    }
+
+    public void onClickChangePassword(View view) {
+    }
+
+    public void onClickSetting(View view) {
+    }
+
     public void onClickLogout(View view) {
         logout();
+    }
+
+    private void setUpUI() {
+        binding.navLayout.textViewUserName.setText(
+                viewModel.getUserData().getUser().getName()
+        );
+
+        Drawable drawable = ResourcesCompat.getDrawable(
+                getResources(),
+                R.drawable.user_avatar_bg,
+                null
+        );
+        int color = ColorUtil.MATERIAL.getColor(
+                viewModel.getUserData().getUser().getName()
+        );
+        drawable.setColorFilter(
+                color, PorterDuff.Mode.ADD
+        );
+        binding.navLayout.appcompatImageViewUserImage.setImageDrawable(
+                drawable
+        );
+        binding.navLayout.textViewUserInitials.setText(
+                String.valueOf(
+                        viewModel.getUserData().getUser().getName().toCharArray()[0]
+                )
+                        .toUpperCase()
+        );
+        binding.navLayout.textViewUserInitials.setTextColor(
+                ColorUtil.MATERIAL.getComplementColorInBlackAndWhite(
+                        color
+                )
+        );
     }
 
     private void bindToViewModel() {
@@ -87,6 +136,13 @@ public class Dashboard extends AppCompatActivity {
                             }
                         }
                 );
+    }
+
+    private void gotoProfile() {
+        startActivity(
+                new Intent(this, Profile.class)
+        );
+        finish();
     }
 
     private void logout() {
