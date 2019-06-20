@@ -30,6 +30,7 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.MultipartBody;
 import okhttp3.ResponseBody;
 import retrofit2.HttpException;
 import retrofit2.Response;
@@ -45,6 +46,7 @@ public class Repository {
     public MutableLiveData<Result> mutableLiveDataForgotPasswordResult;
     public MutableLiveData<Result> mutableLiveDataResetPasswordResult;
     public MutableLiveData<Result> mutableLiveDataLogoutResult;
+    public MutableLiveData<Result> mutableLiveDataUpdateAvatarResult;
 
     public Repository(
             ApiInterface apiInterface,
@@ -62,6 +64,7 @@ public class Repository {
         mutableLiveDataForgotPasswordResult = new MutableLiveData<>();
         mutableLiveDataResetPasswordResult = new MutableLiveData<>();
         mutableLiveDataLogoutResult = new MutableLiveData<>();
+        mutableLiveDataUpdateAvatarResult = new MutableLiveData<>();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,6 +88,7 @@ public class Repository {
                             public void onNext(Response<ResponseBody> responseBodyResponse) {
                                 if (responseBodyResponse.code() == 201) {
                                     try {
+                                        //noinspection ConstantConditions
                                         saveUserData(
                                                 new Gson().fromJson(
                                                         responseBodyResponse.body().string(),
@@ -109,16 +113,13 @@ public class Repository {
                                 }
 
                                 new Thread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataSignUpResult.postValue(null);
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
                                             }
+                                            mutableLiveDataSignUpResult.postValue(null);
                                         }
                                 ).start();
                             }
@@ -133,16 +134,13 @@ public class Repository {
                                 );
 
                                 new Thread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataSignUpResult.postValue(null);
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
                                             }
+                                            mutableLiveDataSignUpResult.postValue(null);
                                         }
                                 ).start();
                             }
@@ -172,6 +170,7 @@ public class Repository {
                             public void onNext(Response<ResponseBody> responseBodyResponse) {
                                 if (responseBodyResponse.code() == 200) {
                                     try {
+                                        //noinspection ConstantConditions
                                         saveUserData(
                                                 new Gson().fromJson(
                                                         responseBodyResponse.body().string(),
@@ -196,16 +195,13 @@ public class Repository {
                                 }
 
                                 new Thread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataLoginResult.postValue(null);
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
                                             }
+                                            mutableLiveDataLoginResult.postValue(null);
                                         }
                                 ).start();
                             }
@@ -220,16 +216,13 @@ public class Repository {
                                 );
 
                                 new Thread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataLoginResult.postValue(null);
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
                                             }
+                                            mutableLiveDataLoginResult.postValue(null);
                                         }
                                 ).start();
                             }
@@ -274,16 +267,13 @@ public class Repository {
                                 }
 
                                 new Thread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataForgotPasswordResult.postValue(null);
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
                                             }
+                                            mutableLiveDataForgotPasswordResult.postValue(null);
                                         }
                                 ).start();
                             }
@@ -298,16 +288,13 @@ public class Repository {
                                 );
 
                                 new Thread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataForgotPasswordResult.postValue(null);
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
                                             }
+                                            mutableLiveDataForgotPasswordResult.postValue(null);
                                         }
                                 ).start();
                             }
@@ -352,16 +339,13 @@ public class Repository {
                                 }
 
                                 new Thread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataResetPasswordResult.postValue(null);
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
                                             }
+                                            mutableLiveDataResetPasswordResult.postValue(null);
                                         }
                                 ).start();
                             }
@@ -376,16 +360,13 @@ public class Repository {
                                 );
 
                                 new Thread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataResetPasswordResult.postValue(null);
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
                                             }
+                                            mutableLiveDataResetPasswordResult.postValue(null);
                                         }
                                 ).start();
                             }
@@ -425,16 +406,13 @@ public class Repository {
                                     );
 
                                     new Thread(
-                                            new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    try {
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                    mutableLiveDataLogoutResult.postValue(null);
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
                                                 }
+                                                mutableLiveDataLogoutResult.postValue(null);
                                             }
                                     ).start();
                                 } else {
@@ -446,16 +424,13 @@ public class Repository {
                                     );
 
                                     new Thread(
-                                            new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    try {
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                    mutableLiveDataLogoutResult.postValue(null);
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
                                                 }
+                                                mutableLiveDataLogoutResult.postValue(null);
                                             }
                                     ).start();
                                 }
@@ -471,16 +446,103 @@ public class Repository {
                                 );
 
                                 new Thread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            mutableLiveDataLogoutResult.postValue(null);
+                                        }
+                                ).start();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
+
+    public void updateAvatar(MultipartBody.Part picture) {
+        apiInterface.updateAvatar(
+                getAuthToken(),
+                picture
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 401)
+                                    notAuthorised();
+                                else if (responseBodyResponse.code() == 200) {
+                                    mutableLiveDataUpdateAvatarResult.postValue(
+                                            new Result(
+                                                    Enums.Result.SUCCESS,
+                                                    ""
+                                            )
+                                    );
+
+                                    new Thread(
+                                            () -> {
                                                 try {
                                                     Thread.sleep(1000);
                                                 } catch (InterruptedException e) {
                                                     e.printStackTrace();
                                                 }
-                                                mutableLiveDataLogoutResult.postValue(null);
+                                                mutableLiveDataUpdateAvatarResult.postValue(null);
                                             }
+                                    ).start();
+                                } else {
+                                    mutableLiveDataUpdateAvatarResult.postValue(
+                                            new Result(
+                                                    Enums.Result.FAIL,
+                                                    getErrorMessage(
+                                                            responseBodyResponse.errorBody()
+                                                    )
+                                            )
+                                    );
+
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                mutableLiveDataUpdateAvatarResult.postValue(null);
+                                            }
+                                    ).start();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                mutableLiveDataUpdateAvatarResult.postValue(
+                                        new Result(
+                                                Enums.Result.FAIL,
+                                                getErrorMessage(
+                                                        e
+                                                )
+                                        )
+                                );
+
+                                new Thread(
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            mutableLiveDataUpdateAvatarResult.postValue(null);
                                         }
                                 ).start();
                             }
@@ -504,29 +566,45 @@ public class Repository {
                 false
         );
     }
+
+    public void notAuthorised() {
+        clearAllData();
+
+        new Thread(
+                () -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    restartApp();
+                }
+        ).start();
+    }
+
+    public UserData getUserData() {
+        try {
+            return new Gson().fromJson(
+                    preferences.getString(
+                            KeyWordsAndConstants.USER_DATA,
+                            ""
+                    ),
+                    UserData.class
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new UserData();
+        }
+    }
+
+    public String getAuthToken() {
+        return "Bearer " + getToken();
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     //Private Methods
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void notAuthorised() {
-        clearAllData();
-
-        new Thread(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        restartApp();
-                    }
-                }
-        ).start();
-    }
 
     private void restartApp() {
         Intent intent = new Intent(application, Launcher.class);
@@ -539,7 +617,9 @@ public class Repository {
                         PendingIntent.FLAG_CANCEL_CURRENT
                 );
         AlarmManager mgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
-        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+        if (mgr != null) {
+            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+        }
         System.exit(0);
     }
 
@@ -566,27 +646,8 @@ public class Repository {
         preferences.edit().clear().apply();
     }
 
-    public UserData getUserData() {
-        try {
-            return new Gson().fromJson(
-                    preferences.getString(
-                            KeyWordsAndConstants.USER_DATA,
-                            ""
-                    ),
-                    UserData.class
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new UserData();
-        }
-    }
-
     private String getToken() {
         return getUserData().getToken();
-    }
-
-    private String getAuthToken() {
-        return "Bearer " + getToken();
     }
 
     private String getErrorMessage(Throwable throwable) {

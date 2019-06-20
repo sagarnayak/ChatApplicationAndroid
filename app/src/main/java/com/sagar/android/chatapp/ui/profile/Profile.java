@@ -14,19 +14,26 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.fxn.pix.Options;
 import com.fxn.pix.Pix;
 import com.fxn.utility.ImageQuality;
 import com.sagar.android.chatapp.R;
+import com.sagar.android.chatapp.core.Enums;
+import com.sagar.android.chatapp.core.URLs;
 import com.sagar.android.chatapp.databinding.ActivityProfileBinding;
+import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.UserData;
 import com.sagar.android.chatapp.ui.dashboard.Dashboard;
+import com.sagar.android.chatapp.util.CircleTransformation;
 import com.sagar.android.chatapp.util.ColorUtil;
 import com.sagar.android.chatapp.util.DialogUtil;
 import com.sagar.android.chatapp.util.ProgressUtil;
 import com.sagar.android.logutilmaster.LogUtil;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -34,6 +41,9 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.OnNeverAskAgain;
 import permissions.dispatcher.OnPermissionDenied;
@@ -48,10 +58,13 @@ public class Profile extends AppCompatActivity {
     @Inject
     public ProgressUtil progressUtil;
     @Inject
+    public Picasso picassoAuthenticated;
+    @Inject
     public LogUtil logUtil;
 
     private ProfileViewModel viewModel;
     private ActivityProfileBinding binding;
+    private Bitmap bitmapUserPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +90,8 @@ public class Profile extends AppCompatActivity {
         bindToViewModel();
 
         setUpUI();
+
+        setPictureToUI(false);
     }
 
     @Override
@@ -139,9 +154,6 @@ public class Profile extends AppCompatActivity {
 
     public void onClickEditPicture(View view) {
         changeDp();
-    }
-
-    private void bindToViewModel() {
     }
 
     @NeedsPermission(
@@ -214,15 +226,80 @@ public class Profile extends AppCompatActivity {
                     returnValue) {
                 logUtil.logV(str);
                 File file = new File(str);
-                Bitmap bitmap = new BitmapDrawable(
+                bitmapUserPicture = new BitmapDrawable(
                         getResources(),
                         file.getAbsolutePath()
                 )
                         .getBitmap();
-                binding.contentProfile.appcompatImageViewUserImage.setImageBitmap(bitmap);
+
+                sendPictureToServer(file);
             }
         }
     }
 
-    private void setPictureToUI(){}
+    private void bindToViewModel() {
+        viewModel.mediatorLiveDataUpdateAvatarResult
+                .observe(
+                        this,
+                        new Observer<Result>() {
+                            @Override
+                            public void onChanged(Result result) {
+                                if (result != null)
+                                    processUpdateAvatarResult(result);
+                            }
+                        }
+                );
+    }
+
+    private void sendPictureToServer(File file) {
+        progressUtil.show();
+        okhttp3.RequestBody reqFilePic = RequestBody.create(
+                MediaType.parse("image/*"),
+                file
+        );
+        MultipartBody.Part bodyPic = MultipartBody.Part.createFormData("avatar", file.getName(), reqFilePic);
+
+        viewModel.updateAvatar(bodyPic);
+    }
+
+    private void processUpdateAvatarResult(Result result) {
+        progressUtil.hide();
+        if (result.getResult() == Enums.Result.FAIL) {
+            DialogUtil.showDialogWithMessage(
+                    this,
+                    result.getMessage()
+            );
+            return;
+        }
+        setPictureToUI(true);
+    }
+
+    private void setPictureToUI(boolean shouldRefreshCache) {
+        if (shouldRefreshCache)
+            picassoAuthenticated.invalidate(URLs.AVATAR_URL);
+        picassoAuthenticated
+                .load(
+                        URLs.AVATAR_URL
+                )
+                .transform(
+                        new CircleTransformation()
+                )
+                .into(
+                        binding.contentProfile.appcompatImageViewUserImage,
+                        new Callback() {
+                            @Override
+                            public void onSuccess() {
+
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                if (e.toString().contains("401"))
+                                    viewModel.notAuthorised();
+                            }
+                        }
+                );
+
+        binding.contentProfile.textViewUserInitials.setVisibility(View.GONE);
+    }
 }
