@@ -27,7 +27,6 @@
             android:layout_width="80dp"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
-            android:background="@drawable/user_avatar_bg"
             app:layout_constraintBottom_toBottomOf="@+id/appcompatImageViewNavBg"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintStart_toStartOf="parent"

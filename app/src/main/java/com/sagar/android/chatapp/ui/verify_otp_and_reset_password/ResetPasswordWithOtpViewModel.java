@@ -1,7 +1,6 @@
 package com.sagar.android.chatapp.ui.verify_otp_and_reset_password;
 
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.sagar.android.chatapp.model.ResetPasswordRequest;
@@ -24,12 +23,7 @@ public class ResetPasswordWithOtpViewModel extends ViewModel {
     private void bindToRepo() {
         mediatorLiveDataResetPasswordResult.addSource(
                 repository.mutableLiveDataResetPasswordResult,
-                new Observer<Result>() {
-                    @Override
-                    public void onChanged(Result result) {
-                        mediatorLiveDataResetPasswordResult.postValue(result);
-                    }
-                }
+                result -> mediatorLiveDataResetPasswordResult.postValue(result)
         );
     }
 

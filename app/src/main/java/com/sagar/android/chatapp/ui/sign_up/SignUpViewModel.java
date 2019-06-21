@@ -1,7 +1,6 @@
 package com.sagar.android.chatapp.ui.sign_up;
 
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.sagar.android.chatapp.model.Result;
@@ -25,16 +24,15 @@ public class SignUpViewModel extends ViewModel {
     private void bindToRepo() {
         mediatorLiveDataSignUpResult.addSource(
                 repository.mutableLiveDataSignUpResult,
-                new Observer<Result>() {
-                    @Override
-                    public void onChanged(Result result) {
-                        mediatorLiveDataSignUpResult.postValue(result);
-                    }
-                }
+                result -> mediatorLiveDataSignUpResult.postValue(result)
         );
     }
 
     public void signUp(UserSignUpRequest userSignUpRequest) {
         repository.signUp(userSignUpRequest);
+    }
+
+    public void tryUpdatingFCMToken(String token) {
+        repository.tryUpdatingFCMToken(token);
     }
 }

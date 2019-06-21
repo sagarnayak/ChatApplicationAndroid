@@ -12,6 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.google.gson.Gson;
 import com.sagar.android.chatapp.core.Enums;
 import com.sagar.android.chatapp.core.KeyWordsAndConstants;
+import com.sagar.android.chatapp.model.FcmTokenData;
 import com.sagar.android.chatapp.model.LoginRequest;
 import com.sagar.android.chatapp.model.ResetPasswordRequest;
 import com.sagar.android.chatapp.model.Result;
@@ -21,6 +22,7 @@ import com.sagar.android.chatapp.repository.retrofit.ApiInterface;
 import com.sagar.android.chatapp.ui.launcher.Launcher;
 import com.sagar.android.logutilmaster.LogUtil;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -47,6 +49,7 @@ public class Repository {
     public MutableLiveData<Result> mutableLiveDataResetPasswordResult;
     public MutableLiveData<Result> mutableLiveDataLogoutResult;
     public MutableLiveData<Result> mutableLiveDataUpdateAvatarResult;
+    public MutableLiveData<Result> mutableLiveDataShouldClearPicassoCacheForAvatar;
 
     public Repository(
             ApiInterface apiInterface,
@@ -65,6 +68,7 @@ public class Repository {
         mutableLiveDataResetPasswordResult = new MutableLiveData<>();
         mutableLiveDataLogoutResult = new MutableLiveData<>();
         mutableLiveDataUpdateAvatarResult = new MutableLiveData<>();
+        mutableLiveDataShouldClearPicassoCacheForAvatar = new MutableLiveData<>();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -543,6 +547,191 @@ public class Repository {
                                                 e1.printStackTrace();
                                             }
                                             mutableLiveDataUpdateAvatarResult.postValue(null);
+                                        }
+                                ).start();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
+
+    public void tryUpdatingFCMToken(String token) {
+        if (!isLoggedIn())
+            return;
+
+        apiInterface.updateFCMToken(
+                getAuthToken(),
+                new FcmTokenData(token)
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 401)
+                                    notAuthorised();
+                                else if (responseBodyResponse.code() == 200)
+                                    logUtil.logV("updated fcm token");
+                                else
+                                    logUtil.logV("failed to update fcm token");
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                logUtil.logV("failed to update fcm token : " + e);
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
+
+    public void ping() {
+        apiInterface.ping(
+                getAuthToken()
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 401)
+                                    notAuthorised();
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
+
+    public void shouldClearPicassoCacheForAvatar() {
+        apiInterface.avatarUpdateTimeStamp(
+                getAuthToken()
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 401)
+                                    notAuthorised();
+                                else if (responseBodyResponse.code() == 200) {
+                                    try {
+                                        JSONObject jsonObject = new JSONObject(responseBodyResponse.body().string());
+
+                                        if (
+                                                !preferences.getString(
+                                                        KeyWordsAndConstants.AVATAR_UPDATE_TIMESTAMP,
+                                                        ""
+                                                ).equalsIgnoreCase(
+                                                        jsonObject.getString("timeStamp")
+                                                )
+                                        ) {
+                                            mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
+                                                    new Result(
+                                                            Enums.Result.SUCCESS, ""
+                                                    )
+                                            );
+                                        } else {
+                                            mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
+                                                    new Result(
+                                                            Enums.Result.FAIL, ""
+                                                    )
+                                            );
+                                        }
+
+                                        preferences.edit()
+                                                .putString(
+                                                        KeyWordsAndConstants.AVATAR_UPDATE_TIMESTAMP,
+                                                        jsonObject.getString("timeStamp")
+                                                ).apply();
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                        mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
+                                                new Result(
+                                                        Enums.Result.FAIL, ""
+                                                )
+                                        );
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
+                                                new Result(
+                                                        Enums.Result.FAIL, ""
+                                                )
+                                        );
+                                    }
+                                } else //noinspection StatementWithEmptyBody
+                                    if (responseBodyResponse.code() == 404) {
+                                        //the picture is not present
+                                    } else {
+                                        mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
+                                                new Result(
+                                                        Enums.Result.FAIL, ""
+                                                )
+                                        );
+                                    }
+
+                                /*new Thread(
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(null);
+                                        }
+                                ).start();*/
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
+                                        new Result(
+                                                Enums.Result.FAIL, ""
+                                        )
+                                );
+
+                                new Thread(
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(null);
                                         }
                                 ).start();
                             }

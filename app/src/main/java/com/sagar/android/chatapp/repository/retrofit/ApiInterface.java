@@ -1,5 +1,6 @@
 package com.sagar.android.chatapp.repository.retrofit;
 
+import com.sagar.android.chatapp.model.FcmTokenData;
 import com.sagar.android.chatapp.model.LoginRequest;
 import com.sagar.android.chatapp.model.ResetPasswordRequest;
 import com.sagar.android.chatapp.model.UserSignUpRequest;
@@ -49,5 +50,21 @@ public interface ApiInterface {
     Observable<Response<ResponseBody>> updateAvatar(
             @Header("Authorization") String authHeader,
             @Part MultipartBody.Part userPicture
+    );
+
+    @PATCH("updateFCMToken")
+    Observable<Response<ResponseBody>> updateFCMToken(
+            @Header("Authorization") String authHeader,
+            @Body FcmTokenData fcmToken
+    );
+
+    @GET("ping")
+    Observable<Response<ResponseBody>> ping(
+            @Header("Authorization") String authHeader
+    );
+
+    @GET("avatarUpdateTimeStamp")
+    Observable<Response<ResponseBody>> avatarUpdateTimeStamp(
+            @Header("Authorization") String authHeader
     );
 }

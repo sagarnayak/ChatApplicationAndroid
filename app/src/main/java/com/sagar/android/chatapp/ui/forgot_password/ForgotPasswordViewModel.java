@@ -1,7 +1,6 @@
 package com.sagar.android.chatapp.ui.forgot_password;
 
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.sagar.android.chatapp.model.Result;
@@ -23,12 +22,7 @@ public class ForgotPasswordViewModel extends ViewModel {
     private void bindToRepo() {
         mediatorLiveDataForgotPasswordResult.addSource(
                 repository.mutableLiveDataForgotPasswordResult,
-                new Observer<Result>() {
-                    @Override
-                    public void onChanged(Result result) {
-                        mediatorLiveDataForgotPasswordResult.postValue(result);
-                    }
-                }
+                result -> mediatorLiveDataForgotPasswordResult.postValue(result)
         );
     }
 

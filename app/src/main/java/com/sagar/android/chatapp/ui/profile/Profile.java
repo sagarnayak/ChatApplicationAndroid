@@ -2,10 +2,11 @@ package com.sagar.android.chatapp.ui.profile;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.IntentFilter;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -14,7 +15,6 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.fxn.pix.Options;
@@ -64,7 +64,13 @@ public class Profile extends AppCompatActivity {
 
     private ProfileViewModel viewModel;
     private ActivityProfileBinding binding;
-    private Bitmap bitmapUserPicture;
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            viewModel.shouldClearCacheForAvatar();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +97,13 @@ public class Profile extends AppCompatActivity {
 
         setUpUI();
 
-        setPictureToUI(false);
+        viewModel.shouldClearCacheForAvatar();
+
+        IntentFilter intentFilter = new IntentFilter("AvatarUpdated");
+        registerReceiver(
+                receiver,
+                intentFilter
+        );
     }
 
     @Override
@@ -226,11 +238,6 @@ public class Profile extends AppCompatActivity {
                     returnValue) {
                 logUtil.logV(str);
                 File file = new File(str);
-                bitmapUserPicture = new BitmapDrawable(
-                        getResources(),
-                        file.getAbsolutePath()
-                )
-                        .getBitmap();
 
                 sendPictureToServer(file);
             }
@@ -241,12 +248,18 @@ public class Profile extends AppCompatActivity {
         viewModel.mediatorLiveDataUpdateAvatarResult
                 .observe(
                         this,
-                        new Observer<Result>() {
-                            @Override
-                            public void onChanged(Result result) {
-                                if (result != null)
-                                    processUpdateAvatarResult(result);
-                            }
+                        result -> {
+                            if (result != null)
+                                processUpdateAvatarResult(result);
+                        }
+                );
+
+        viewModel.mediatorLiveDataShouldClearPicassoCacheForAvatar
+                .observe(
+                        this,
+                        result -> {
+                            if (result != null)
+                                processShouldClearCacheForAvatarResult(result);
                         }
                 );
     }
@@ -289,7 +302,7 @@ public class Profile extends AppCompatActivity {
                         new Callback() {
                             @Override
                             public void onSuccess() {
-
+                                binding.contentProfile.textViewUserInitials.setVisibility(View.GONE);
                             }
 
                             @Override
@@ -299,7 +312,13 @@ public class Profile extends AppCompatActivity {
                             }
                         }
                 );
+    }
 
-        binding.contentProfile.textViewUserInitials.setVisibility(View.GONE);
+    private void processShouldClearCacheForAvatarResult(Result result) {
+        if (result.getResult() == Enums.Result.SUCCESS) {
+            setPictureToUI(true);
+        } else {
+            setPictureToUI(false);
+        }
     }
 }

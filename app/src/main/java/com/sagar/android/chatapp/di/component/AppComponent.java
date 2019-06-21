@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.sagar.android.chatapp.application.ApplicationClass;
 import com.sagar.android.chatapp.di.builder.DashboardActivityBuilder;
+import com.sagar.android.chatapp.di.builder.FirebaseMessagingServiceBuilder;
 import com.sagar.android.chatapp.di.builder.ForgotPasswordActivityBuilder;
 import com.sagar.android.chatapp.di.builder.LauncherActivityBuilder;
 import com.sagar.android.chatapp.di.builder.LoginActivityBuilder;
@@ -36,7 +37,8 @@ import dagger.android.AndroidInjectionModule;
                 ForgotPasswordActivityBuilder.class,
                 ResetPasswordWithOtpActivityBuilder.class,
                 DashboardActivityBuilder.class,
-                ProfileActivityBuilder.class
+                ProfileActivityBuilder.class,
+                FirebaseMessagingServiceBuilder.class
         }
 )
 public interface AppComponent {

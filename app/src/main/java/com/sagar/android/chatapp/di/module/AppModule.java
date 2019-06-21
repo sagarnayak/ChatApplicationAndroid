@@ -1,6 +1,7 @@
 package com.sagar.android.chatapp.di.module;
 
 import com.sagar.android.chatapp.di.component.DashboardSubComponent;
+import com.sagar.android.chatapp.di.component.FirebaseMessagingServiceSubComponent;
 import com.sagar.android.chatapp.di.component.ForgotPasswordSubComponent;
 import com.sagar.android.chatapp.di.component.LauncherSubComponent;
 import com.sagar.android.chatapp.di.component.LoginSubComponent;
@@ -18,7 +19,8 @@ import dagger.Module;
                 ForgotPasswordSubComponent.class,
                 ResetPasswordWithOtpSubComponent.class,
                 DashboardSubComponent.class,
-                ProfileSubComponent.class
+                ProfileSubComponent.class,
+                FirebaseMessagingServiceSubComponent.class
         }
 )
 public class AppModule {

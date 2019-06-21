@@ -85,12 +85,9 @@ public class ResetPasswordWithOtp extends AppCompatActivity {
         viewModel.mediatorLiveDataResetPasswordResult
                 .observe(
                         this,
-                        new Observer<Result>() {
-                            @Override
-                            public void onChanged(Result result) {
-                                if (result != null)
-                                    processResetPasswordResult(result);
-                            }
+                        result -> {
+                            if (result != null)
+                                processResetPasswordResult(result);
                         }
                 );
     }

@@ -11,18 +11,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.sagar.android.chatapp.R;
 import com.sagar.android.chatapp.core.Enums;
+import com.sagar.android.chatapp.core.URLs;
 import com.sagar.android.chatapp.databinding.ActivityDashboardBinding;
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.ui.login.Login;
 import com.sagar.android.chatapp.ui.profile.Profile;
+import com.sagar.android.chatapp.util.CircleTransformation;
 import com.sagar.android.chatapp.util.ColorUtil;
 import com.sagar.android.chatapp.util.DialogUtil;
 import com.sagar.android.chatapp.util.ProgressUtil;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import javax.inject.Inject;
 
@@ -34,6 +37,8 @@ public class Dashboard extends AppCompatActivity {
     public DashboardViewModelProvider viewModelProvider;
     @Inject
     public ProgressUtil progressUtil;
+    @Inject
+    public Picasso picassoAuthenticated;
 
     private DashboardViewModel viewModel;
     private ActivityDashboardBinding binding;
@@ -63,6 +68,8 @@ public class Dashboard extends AppCompatActivity {
         bindToViewModel();
 
         setUpUI();
+
+        viewModel.ping();
     }
 
     @Override
@@ -122,18 +129,52 @@ public class Dashboard extends AppCompatActivity {
                         color
                 )
         );
+        viewModel.shouldClearCacheForAvatar();
+    }
+
+    private void setAvatarToUI(boolean shouldRefreshCache) {
+        if (shouldRefreshCache)
+            picassoAuthenticated.invalidate(URLs.AVATAR_URL);
+        picassoAuthenticated
+                .load(
+                        URLs.AVATAR_URL
+                )
+                .transform(
+                        new CircleTransformation()
+                )
+                .into(
+                        binding.navLayout.appcompatImageViewUserImage,
+                        new Callback() {
+                            @Override
+                            public void onSuccess() {
+                                binding.navLayout.textViewUserInitials.setVisibility(View.GONE);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                if (e.toString().contains("401"))
+                                    viewModel.notAuthorised();
+                            }
+                        }
+                );
     }
 
     private void bindToViewModel() {
         viewModel.mediatorLiveDataLogoutResult
                 .observe(
                         this,
-                        new Observer<Result>() {
-                            @Override
-                            public void onChanged(Result result) {
-                                if (result != null)
-                                    processLogoutResult(result);
-                            }
+                        result -> {
+                            if (result != null)
+                                processLogoutResult(result);
+                        }
+                );
+
+        viewModel.mediatorLiveDataShouldClearPicassoCacheForAvatar
+                .observe(
+                        this,
+                        result -> {
+                            if (result != null)
+                                processShouldClearPicassoCacheForAvatarResult(result);
                         }
                 );
     }
@@ -164,5 +205,12 @@ public class Dashboard extends AppCompatActivity {
                 this,
                 result.getMessage()
         );
+    }
+
+    private void processShouldClearPicassoCacheForAvatarResult(Result result) {
+        if (result.getResult() == Enums.Result.SUCCESS)
+            setAvatarToUI(true);
+        else
+            setAvatarToUI(false);
     }
 }

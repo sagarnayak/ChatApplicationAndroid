@@ -1,7 +1,6 @@
 package com.sagar.android.chatapp.ui.login;
 
 import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.sagar.android.chatapp.model.LoginRequest;
@@ -24,16 +23,15 @@ public class LoginViewModel extends ViewModel {
     private void bindToRepo() {
         mediatorLiveDataLoginResult.addSource(
                 repository.mutableLiveDataLoginResult,
-                new Observer<Result>() {
-                    @Override
-                    public void onChanged(Result result) {
-                        mediatorLiveDataLoginResult.postValue(result);
-                    }
-                }
+                result -> mediatorLiveDataLoginResult.postValue(result)
         );
     }
 
     public void login(LoginRequest loginRequest) {
         repository.login(loginRequest);
+    }
+
+    public void tryUpdatingFcmToken(String token) {
+        repository.tryUpdatingFCMToken(token);
     }
 }

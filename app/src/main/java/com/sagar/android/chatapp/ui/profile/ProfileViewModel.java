@@ -13,11 +13,13 @@ public class ProfileViewModel extends ViewModel {
     public Repository repository;
 
     public MediatorLiveData<Result> mediatorLiveDataUpdateAvatarResult;
+    public MediatorLiveData<Result> mediatorLiveDataShouldClearPicassoCacheForAvatar;
 
     public ProfileViewModel(Repository repository) {
         this.repository = repository;
 
         mediatorLiveDataUpdateAvatarResult = new MediatorLiveData<>();
+        mediatorLiveDataShouldClearPicassoCacheForAvatar = new MediatorLiveData<>();
 
         bindToRepo();
     }
@@ -26,6 +28,11 @@ public class ProfileViewModel extends ViewModel {
         mediatorLiveDataUpdateAvatarResult.addSource(
                 repository.mutableLiveDataUpdateAvatarResult,
                 result -> mediatorLiveDataUpdateAvatarResult.postValue(result)
+        );
+
+        mediatorLiveDataShouldClearPicassoCacheForAvatar.addSource(
+                repository.mutableLiveDataShouldClearPicassoCacheForAvatar,
+                result -> mediatorLiveDataShouldClearPicassoCacheForAvatar.postValue(result)
         );
     }
 
@@ -41,5 +48,9 @@ public class ProfileViewModel extends ViewModel {
 
     public void notAuthorised() {
         repository.notAuthorised();
+    }
+
+    public void shouldClearCacheForAvatar() {
+        repository.shouldClearPicassoCacheForAvatar();
     }
 }

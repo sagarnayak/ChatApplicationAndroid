@@ -17,11 +17,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <service
-            android:name=".firebase.PushNotificationHandler"
-            android:enabled="true"
-            android:exported="true"></service>
-
+        <activity
+            android:name=".ui.change_password.ChangePassword"
+            android:label="@string/title_activity_change_password"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".ui.profile.Profile"
             android:label="@string/title_activity_profile"

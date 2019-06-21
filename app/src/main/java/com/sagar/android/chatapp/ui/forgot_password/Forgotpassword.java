@@ -8,7 +8,6 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.sagar.android.chatapp.R;
@@ -94,12 +93,9 @@ public class Forgotpassword extends AppCompatActivity {
         viewModel.mediatorLiveDataForgotPasswordResult
                 .observe(
                         this,
-                        new Observer<Result>() {
-                            @Override
-                            public void onChanged(Result result) {
-                                if (result != null)
-                                    processForgotPasswordResult(result);
-                            }
+                        result -> {
+                            if (result != null)
+                                processForgotPasswordResult(result);
                         }
                 );
     }

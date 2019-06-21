@@ -8,9 +8,9 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.sagar.android.chatapp.R;
 import com.sagar.android.chatapp.core.Enums;
 import com.sagar.android.chatapp.databinding.ActivitySignUpBinding;
@@ -92,12 +92,9 @@ public class SignUp extends AppCompatActivity {
         viewModel.mediatorLiveDataSignUpResult
                 .observe(
                         this,
-                        new Observer<Result>() {
-                            @Override
-                            public void onChanged(Result result) {
-                                if (result != null)
-                                    processSignUpResult(result);
-                            }
+                        result -> {
+                            if (result != null)
+                                processSignUpResult(result);
                         }
                 );
     }
@@ -172,6 +169,25 @@ public class SignUp extends AppCompatActivity {
             );
             return;
         }
+        getFcmTokenAndUpdate();
+    }
+
+    private void getFcmTokenAndUpdate() {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(
+                        task -> {
+                            if (task.isSuccessful()) {
+                                viewModel.tryUpdatingFCMToken(
+                                        task.getResult().getToken()
+                                );
+                            }
+
+                            gotoDashBoard();
+                        }
+                );
+    }
+
+    private void gotoDashBoard() {
         startActivity(
                 new Intent(this, Dashboard.class)
         );
