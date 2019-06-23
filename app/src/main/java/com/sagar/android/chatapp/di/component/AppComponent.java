@@ -10,6 +10,7 @@ import com.sagar.android.chatapp.di.builder.LauncherActivityBuilder;
 import com.sagar.android.chatapp.di.builder.LoginActivityBuilder;
 import com.sagar.android.chatapp.di.builder.ProfileActivityBuilder;
 import com.sagar.android.chatapp.di.builder.ResetPasswordWithOtpActivityBuilder;
+import com.sagar.android.chatapp.di.builder.SettingsActivityBuilder;
 import com.sagar.android.chatapp.di.builder.SignUpActivityBuilder;
 import com.sagar.android.chatapp.di.module.AppModule;
 import com.sagar.android.chatapp.di.module.LogUtilModule;
@@ -38,7 +39,8 @@ import dagger.android.AndroidInjectionModule;
                 ResetPasswordWithOtpActivityBuilder.class,
                 DashboardActivityBuilder.class,
                 ProfileActivityBuilder.class,
-                FirebaseMessagingServiceBuilder.class
+                FirebaseMessagingServiceBuilder.class,
+                SettingsActivityBuilder.class
         }
 )
 public interface AppComponent {

@@ -67,4 +67,9 @@ public interface ApiInterface {
     Observable<Response<ResponseBody>> avatarUpdateTimeStamp(
             @Header("Authorization") String authHeader
     );
+
+    @POST("logoutAll")
+    Observable<Response<ResponseBody>> logoutAll(
+            @Header("Authorization") String authHeader
+    );
 }

@@ -42,10 +42,6 @@ public class DashboardViewModel extends ViewModel {
         return repository.getUserData();
     }
 
-    public void ping() {
-        repository.ping();
-    }
-
     public void shouldClearCacheForAvatar() {
         repository.shouldClearPicassoCacheForAvatar();
     }

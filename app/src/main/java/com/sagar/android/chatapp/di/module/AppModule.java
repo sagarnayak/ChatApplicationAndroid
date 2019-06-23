@@ -7,6 +7,7 @@ import com.sagar.android.chatapp.di.component.LauncherSubComponent;
 import com.sagar.android.chatapp.di.component.LoginSubComponent;
 import com.sagar.android.chatapp.di.component.ProfileSubComponent;
 import com.sagar.android.chatapp.di.component.ResetPasswordWithOtpSubComponent;
+import com.sagar.android.chatapp.di.component.SettingsSubComponent;
 import com.sagar.android.chatapp.di.component.SignUpSubComponent;
 
 import dagger.Module;
@@ -20,7 +21,8 @@ import dagger.Module;
                 ResetPasswordWithOtpSubComponent.class,
                 DashboardSubComponent.class,
                 ProfileSubComponent.class,
-                FirebaseMessagingServiceSubComponent.class
+                FirebaseMessagingServiceSubComponent.class,
+                SettingsSubComponent.class
         }
 )
 public class AppModule {

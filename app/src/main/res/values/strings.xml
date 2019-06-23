@@ -8,4 +8,5 @@
     <string name="title_activity_verify_reset_password_otp">VerifyResetPasswordOtp</string>
     <string name="title_activity_profile">Profile</string>
     <string name="title_activity_change_password">ChangePassword</string>
+    <string name="title_activity_settings">Settings</string>
 </resources>

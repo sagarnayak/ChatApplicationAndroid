@@ -50,6 +50,7 @@ public class Repository {
     public MutableLiveData<Result> mutableLiveDataLogoutResult;
     public MutableLiveData<Result> mutableLiveDataUpdateAvatarResult;
     public MutableLiveData<Result> mutableLiveDataShouldClearPicassoCacheForAvatar;
+    public MutableLiveData<Result> mutableLiveDataLogoutAllResult;
 
     public Repository(
             ApiInterface apiInterface,
@@ -69,6 +70,7 @@ public class Repository {
         mutableLiveDataLogoutResult = new MutableLiveData<>();
         mutableLiveDataUpdateAvatarResult = new MutableLiveData<>();
         mutableLiveDataShouldClearPicassoCacheForAvatar = new MutableLiveData<>();
+        mutableLiveDataLogoutAllResult = new MutableLiveData<>();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -704,7 +706,7 @@ public class Repository {
                                         );
                                     }
 
-                                /*new Thread(
+                                new Thread(
                                         () -> {
                                             try {
                                                 Thread.sleep(1000);
@@ -713,14 +715,66 @@ public class Repository {
                                             }
                                             mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(null);
                                         }
-                                ).start();*/
+                                ).start();
                             }
 
                             @Override
                             public void onError(Throwable e) {
-                                mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
+
+    public void logoutAll() {
+        apiInterface.logoutAll(
+                getAuthToken()
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 401 || responseBodyResponse.code() == 200)
+                                    notAuthorised();
+                                else {
+                                    mutableLiveDataLogoutAllResult.postValue(
+                                            new Result(
+                                                    Enums.Result.FAIL,
+                                                    getErrorMessage(responseBodyResponse.errorBody())
+                                            )
+                                    );
+
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e1) {
+                                                    e1.printStackTrace();
+                                                }
+                                                mutableLiveDataLogoutAllResult.postValue(null);
+                                            }
+                                    ).start();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                mutableLiveDataLogoutAllResult.postValue(
                                         new Result(
-                                                Enums.Result.FAIL, ""
+                                                Enums.Result.FAIL,
+                                                getErrorMessage(e)
                                         )
                                 );
 
@@ -731,7 +785,7 @@ public class Repository {
                                             } catch (InterruptedException e1) {
                                                 e1.printStackTrace();
                                             }
-                                            mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(null);
+                                            mutableLiveDataLogoutAllResult.postValue(null);
                                         }
                                 ).start();
                             }
