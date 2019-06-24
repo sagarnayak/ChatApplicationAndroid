@@ -1,24 +1,28 @@
 package com.sagar.android.chatapp.ui.dashboard;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Toast;
+import android.view.ViewAnimationUtils;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.TranslateAnimation;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
@@ -54,6 +58,7 @@ public class Dashboard extends AppCompatActivity {
 
     private DashboardViewModel viewModel;
     private ActivityDashboardBinding binding;
+    private MenuItem mSearchItem;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -246,56 +251,113 @@ public class Dashboard extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the search menu action bar.
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.search_menu, menu);
+        getMenuInflater().inflate(R.menu.search_menu, menu);
 
-        // Get the search menu.
-        MenuItem searchMenu = menu.findItem(R.id.search);
+        mSearchItem = menu.findItem(R.id.m_search);
 
-        // Get SearchView object.
-        SearchView searchView = (SearchView) searchMenu.getActionView();
-
-        // Get SearchView autocomplete object.
-        final SearchView.SearchAutoComplete searchAutoComplete = searchView.findViewById(
-                androidx.appcompat.R.id.search_src_text
-        );
-        searchAutoComplete.setBackgroundColor(Color.WHITE);
-        searchAutoComplete.setTextColor(Color.BLACK);
-        searchAutoComplete.setDropDownBackgroundResource(android.R.color.holo_blue_light);
-
-        // Create a new ArrayAdapter and add data to search auto complete object.
-        String dataArr[] = {"Apple", "Amazon", "Amd", "Microsoft", "Microwave", "MicroNews", "Intel", "Intelligence"};
-        ArrayAdapter<String> newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, dataArr);
-        searchAutoComplete.setAdapter(newsAdapter);
-
-        // Listen to search view item on click event.
-        searchAutoComplete.setOnItemClickListener(
-                new AdapterView.OnItemClickListener() {
+        mSearchItem.setOnActionExpandListener(
+                new MenuItem.OnActionExpandListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int itemIndex, long id) {
-                        String queryString = (String) adapterView.getItemAtPosition(itemIndex);
-                        searchAutoComplete.setText("" + queryString);
-                        Toast.makeText(Dashboard.this, "you clicked " + queryString, Toast.LENGTH_LONG).show();
+                    public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                        // Called when SearchView is expanding
+                        animateSearchToolbar(1, true, true);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                        // Called when SearchView is collapsing
+                        if (mSearchItem.isActionViewExpanded()) {
+                            animateSearchToolbar(1, false, false);
+                        }
+                        return true;
+                    }
+                }
+        );
+
+        return true;
+    }
+
+    public void animateSearchToolbar(int numberOfMenuIcon, boolean containsOverflow, boolean show) {
+
+        binding.toolbar.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
+        binding.drawerLayout.setStatusBarBackgroundColor(ContextCompat.getColor(this, R.color.quantum_grey_600));
+
+        if (show) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                int width = binding.toolbar.getWidth() -
+                        (containsOverflow ? getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) : 0) -
+                        ((getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) * numberOfMenuIcon) / 2);
+                Animator createCircularReveal = ViewAnimationUtils.createCircularReveal(binding.toolbar,
+                        isRtl(getResources()) ? binding.toolbar.getWidth() - width : width, binding.toolbar.getHeight() / 2,
+                        0.0f, (float) width);
+                createCircularReveal.setDuration(250);
+                createCircularReveal.start();
+            } else {
+                TranslateAnimation translateAnimation =
+                        new TranslateAnimation(0.0f, 0.0f, (float) (-binding.toolbar.getHeight()), 0.0f);
+                translateAnimation.setDuration(220);
+                binding.toolbar.clearAnimation();
+                binding.toolbar.startAnimation(translateAnimation);
+            }
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                int width = binding.toolbar.getWidth() -
+                        (containsOverflow ? getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) : 0) -
+                        ((getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) * numberOfMenuIcon) / 2);
+                Animator createCircularReveal = ViewAnimationUtils.createCircularReveal(binding.toolbar,
+                        isRtl(getResources()) ? binding.toolbar.getWidth() - width : width, binding.toolbar.getHeight() / 2, (float) width,
+                        0.0f);
+                createCircularReveal.setDuration(250);
+                createCircularReveal.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        binding.toolbar.setBackgroundColor(getThemeColor(Dashboard.this, R.attr.colorPrimary));
+                        binding.drawerLayout.setStatusBarBackgroundColor(getThemeColor(Dashboard.this, R.attr.colorPrimaryDark));
                     }
                 });
+                createCircularReveal.start();
+            } else {
+                AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
+                Animation translateAnimation = new TranslateAnimation(
+                        0.0f, 0.0f, 0.0f,
+                        (float) (-binding.toolbar.getHeight()));
+                AnimationSet animationSet = new AnimationSet(true);
+                animationSet.addAnimation(alphaAnimation);
+                animationSet.addAnimation(translateAnimation);
+                animationSet.setDuration(220);
+                animationSet.setAnimationListener(new Animation.AnimationListener() {
+                    @Override
+                    public void onAnimationStart(Animation animation) {
 
-        // Below event is triggered when submit search query.
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                AlertDialog alertDialog = new AlertDialog.Builder(Dashboard.this).create();
-                alertDialog.setMessage("Search keyword is " + query);
-                alertDialog.show();
-                return false;
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        binding.toolbar.setBackgroundColor(getThemeColor(Dashboard.this, R.attr.colorPrimary));
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animation animation) {
+
+                    }
+                });
+                binding.toolbar.startAnimation(animationSet);
             }
+            binding.drawerLayout.setStatusBarBackgroundColor(getThemeColor(Dashboard.this, R.attr.colorPrimaryDark));
+        }
+    }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
+    private boolean isRtl(Resources resources) {
+        return resources.getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+    }
 
-        return super.onCreateOptionsMenu(menu);
+    private static int getThemeColor(Context context, int id) {
+        Resources.Theme theme = context.getTheme();
+        TypedArray a = theme.obtainStyledAttributes(new int[]{id});
+        int result = a.getColor(0, 0);
+        a.recycle();
+        return result;
     }
 }

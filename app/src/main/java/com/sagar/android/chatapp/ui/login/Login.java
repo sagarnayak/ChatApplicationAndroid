@@ -53,7 +53,7 @@ public class Login extends AppCompatActivity {
         bindToViewModel();
 
         if (BuildConfig.DEBUG) {
-            binding.contentLogin.editTextUserName.setText("sagarn@gmail.com");
+            binding.contentLogin.editTextUserName.setText("snkumar.nayak@gmail.com");
             binding.contentLogin.editTextPassword.setText("qwerty");
         }
     }
