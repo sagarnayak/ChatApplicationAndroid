@@ -47,8 +47,6 @@ public class Dashboard extends AppCompatActivity {
 
     private DashboardViewModel viewModel;
     private ActivityDashboardBinding binding;
-    private Menu search_menu;
-    private MenuItem item_search;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -134,6 +132,7 @@ public class Dashboard extends AppCompatActivity {
         int color = ColorUtil.MATERIAL.getColor(
                 viewModel.getUserData().getUser().getName()
         );
+        //noinspection ConstantConditions
         drawable.setColorFilter(
                 color, PorterDuff.Mode.ADD
         );
