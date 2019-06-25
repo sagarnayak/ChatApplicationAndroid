@@ -1,17 +1,31 @@
 package com.sagar.android.chatapp.ui.dashboard;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
@@ -29,8 +43,11 @@ import com.sagar.android.chatapp.util.CircleTransformation;
 import com.sagar.android.chatapp.util.ColorUtil;
 import com.sagar.android.chatapp.util.DialogUtil;
 import com.sagar.android.chatapp.util.ProgressUtil;
+import com.sagar.android.logutilmaster.LogUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+
+import java.lang.reflect.Field;
 
 import javax.inject.Inject;
 
@@ -44,6 +61,8 @@ public class Dashboard extends AppCompatActivity {
     public ProgressUtil progressUtil;
     @Inject
     public Picasso picassoAuthenticated;
+    @Inject
+    public LogUtil logUtil;
 
     private DashboardViewModel viewModel;
     private ActivityDashboardBinding binding;
@@ -86,13 +105,21 @@ public class Dashboard extends AppCompatActivity {
                 receiver,
                 intentFilter
         );
+
+        setUpSearchToolBar();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home)
             binding.drawerLayout.openDrawer(GravityCompat.START);
-        if (item.getItemId() == R.id.action_filter_search) {
+        if (item.getItemId() == R.id.action_search) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                circleReveal(R.id.searchToolbar, 1, true, true);
+            else
+                searchtollbar.setVisibility(View.VISIBLE);
+
+            item_search.expandActionView();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -243,7 +270,158 @@ public class Dashboard extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
-        getMenuInflater().inflate(R.menu.search_menu, menu);
+        getMenuInflater().inflate(R.menu.dashboard_menu, menu);
         return true;
+    }
+
+    private Toolbar searchtollbar;
+    private Menu search_menu;
+    private MenuItem item_search;
+
+    public void setUpSearchToolBar() {
+        /*
+        search view reference taken form
+        https://github.com/jaisonfdo/SearchViewSample
+         */
+        searchtollbar = binding.searchToolBarLayout.searchToolbar;
+        if (searchtollbar != null) {
+            searchtollbar.inflateMenu(R.menu.menu_search);
+            search_menu = searchtollbar.getMenu();
+
+            searchtollbar.setNavigationOnClickListener(
+                    v -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                            circleReveal(R.id.searchToolbar, 1, true, false);
+                        else
+                            searchtollbar.setVisibility(View.INVISIBLE);
+                    });
+
+            item_search = search_menu.findItem(R.id.action_filter_search);
+
+            item_search.setOnActionExpandListener(
+                    new MenuItem.OnActionExpandListener() {
+                        @Override
+                        public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                            // Do something when expanded
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                            // Do something when collapsed
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                circleReveal(R.id.searchToolbar, 1, true, false);
+                            } else
+                                searchtollbar.setVisibility(View.INVISIBLE);
+                            return true;
+                        }
+                    }
+            );
+            initSearchView();
+        }
+    }
+
+    public void initSearchView() {
+        final SearchView searchView =
+                (SearchView) search_menu.findItem(R.id.action_filter_search).getActionView();
+
+        // Enable/Disable Submit button in the keyboard
+
+        searchView.setSubmitButtonEnabled(false);
+
+        // Change search close button image
+
+        ImageView closeButton = searchView.findViewById(R.id.search_close_btn);
+        closeButton.setImageResource(R.drawable.ic_close);
+
+
+        // set hint and the text colors
+
+        @SuppressLint("CutPasteId") EditText txtSearch = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        txtSearch.setHint("Search..");
+        txtSearch.setHintTextColor(Color.DKGRAY);
+        txtSearch.setTypeface(
+                ResourcesCompat.getFont(
+                        this,
+                        R.font.open_sans
+                )
+        );
+        txtSearch.setTextSize(
+                TypedValue.COMPLEX_UNIT_SP, 14
+        );
+        txtSearch.setTextColor(getResources().getColor(R.color.primary_text));
+
+        // set the cursor
+
+        @SuppressLint("CutPasteId") AutoCompleteTextView searchTextView = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        try {
+            Field mCursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
+            mCursorDrawableRes.setAccessible(true);
+//            mCursorDrawableRes.set(searchTextView, R.drawable.search_cursor); //This sets the cursor resource ID to 0 or @null which will make it visible on white background
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                callSearch(query);
+                searchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                callSearch(newText);
+                return true;
+            }
+
+            public void callSearch(String query) {
+                //Do searching
+            }
+
+        });
+
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
+        final View myView = binding.searchToolBarLayout.searchToolbar;
+
+        int width = myView.getWidth();
+
+        if (posFromRight > 0)
+            width -= (posFromRight * getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material)) - (getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) / 2);
+        if (containsOverflow)
+            width -= getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material);
+
+        int cx = width;
+        int cy = myView.getHeight() / 2;
+
+        Animator anim;
+        if (isShow)
+            anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, (float) width);
+        else
+            anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, (float) width, 0);
+
+        anim.setDuration((long) 220);
+
+        // make the view invisible when the animation is done
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!isShow) {
+                    super.onAnimationEnd(animation);
+                    myView.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        // make the view visible and start the animation
+        if (isShow)
+            myView.setVisibility(View.VISIBLE);
+
+        // start the animation
+        anim.start();
     }
 }

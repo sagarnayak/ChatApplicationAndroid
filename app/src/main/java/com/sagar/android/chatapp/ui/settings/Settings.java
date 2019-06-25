@@ -43,7 +43,7 @@ public class Settings extends AppCompatActivity {
         if (
                 getSupportActionBar() != null
         ) {
-            getSupportActionBar().setTitle("Profile");
+            getSupportActionBar().setTitle("Settings");
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
