@@ -6,8 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -16,13 +15,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.TranslateAnimation;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
@@ -43,6 +44,8 @@ import com.sagar.android.chatapp.util.ProgressUtil;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Field;
+
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
@@ -58,7 +61,8 @@ public class Dashboard extends AppCompatActivity {
 
     private DashboardViewModel viewModel;
     private ActivityDashboardBinding binding;
-    private MenuItem mSearchItem;
+    private Menu search_menu;
+    private MenuItem item_search;
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -98,12 +102,23 @@ public class Dashboard extends AppCompatActivity {
                 receiver,
                 intentFilter
         );
+
+        setSearchtollbar();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home)
             binding.drawerLayout.openDrawer(GravityCompat.START);
+        if (item.getItemId() == R.id.action_filter_search) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                circleReveal(R.id.searchToolbar, 1, true, true);
+            else
+                binding.searchToolbar.setVisibility(View.VISIBLE);
+
+            item_search.expandActionView();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -250,114 +265,147 @@ public class Dashboard extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         getMenuInflater().inflate(R.menu.search_menu, menu);
-
-        mSearchItem = menu.findItem(R.id.m_search);
-
-        mSearchItem.setOnActionExpandListener(
-                new MenuItem.OnActionExpandListener() {
-                    @Override
-                    public boolean onMenuItemActionExpand(MenuItem menuItem) {
-                        // Called when SearchView is expanding
-                        animateSearchToolbar(1, true, true);
-                        return true;
-                    }
-
-                    @Override
-                    public boolean onMenuItemActionCollapse(MenuItem menuItem) {
-                        // Called when SearchView is collapsing
-                        if (mSearchItem.isActionViewExpanded()) {
-                            animateSearchToolbar(1, false, false);
-                        }
-                        return true;
-                    }
-                }
-        );
-
         return true;
     }
 
-    public void animateSearchToolbar(int numberOfMenuIcon, boolean containsOverflow, boolean show) {
+    public void setSearchtollbar() {
+        if (binding.searchToolbar != null) {
+            ((Toolbar) binding.searchToolbar).inflateMenu(R.menu.search_menu);
+            search_menu = ((Toolbar) binding.searchToolbar).getMenu();
 
-        binding.toolbar.setBackgroundColor(ContextCompat.getColor(this, android.R.color.white));
-        binding.drawerLayout.setStatusBarBackgroundColor(ContextCompat.getColor(this, R.color.quantum_grey_600));
+            ((Toolbar) binding.searchToolbar).setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        circleReveal(R.id.searchToolbar, 1, true, false);
+                    else
+                        binding.searchToolbar.setVisibility(View.INVISIBLE);
+                }
+            });
 
-        if (show) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                int width = binding.toolbar.getWidth() -
-                        (containsOverflow ? getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) : 0) -
-                        ((getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) * numberOfMenuIcon) / 2);
-                Animator createCircularReveal = ViewAnimationUtils.createCircularReveal(binding.toolbar,
-                        isRtl(getResources()) ? binding.toolbar.getWidth() - width : width, binding.toolbar.getHeight() / 2,
-                        0.0f, (float) width);
-                createCircularReveal.setDuration(250);
-                createCircularReveal.start();
-            } else {
-                TranslateAnimation translateAnimation =
-                        new TranslateAnimation(0.0f, 0.0f, (float) (-binding.toolbar.getHeight()), 0.0f);
-                translateAnimation.setDuration(220);
-                binding.toolbar.clearAnimation();
-                binding.toolbar.startAnimation(translateAnimation);
-            }
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                int width = binding.toolbar.getWidth() -
-                        (containsOverflow ? getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material) : 0) -
-                        ((getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) * numberOfMenuIcon) / 2);
-                Animator createCircularReveal = ViewAnimationUtils.createCircularReveal(binding.toolbar,
-                        isRtl(getResources()) ? binding.toolbar.getWidth() - width : width, binding.toolbar.getHeight() / 2, (float) width,
-                        0.0f);
-                createCircularReveal.setDuration(250);
-                createCircularReveal.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        super.onAnimationEnd(animation);
-                        binding.toolbar.setBackgroundColor(getThemeColor(Dashboard.this, R.attr.colorPrimary));
-                        binding.drawerLayout.setStatusBarBackgroundColor(getThemeColor(Dashboard.this, R.attr.colorPrimaryDark));
+            item_search = search_menu.findItem(R.id.action_filter_search);
+
+            item_search.setOnActionExpandListener(
+                    new MenuItem.OnActionExpandListener() {
+                        @Override
+                        public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                            // Do something when expanded
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                            // Do something when collapsed
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                circleReveal(R.id.searchToolbar, 1, true, false);
+                            } else
+                                binding.searchToolbar.setVisibility(View.INVISIBLE);
+                            return true;
+                        }
                     }
-                });
-                createCircularReveal.start();
-            } else {
-                AlphaAnimation alphaAnimation = new AlphaAnimation(1.0f, 0.0f);
-                Animation translateAnimation = new TranslateAnimation(
-                        0.0f, 0.0f, 0.0f,
-                        (float) (-binding.toolbar.getHeight()));
-                AnimationSet animationSet = new AnimationSet(true);
-                animationSet.addAnimation(alphaAnimation);
-                animationSet.addAnimation(translateAnimation);
-                animationSet.setDuration(220);
-                animationSet.setAnimationListener(new Animation.AnimationListener() {
-                    @Override
-                    public void onAnimationStart(Animation animation) {
+            );
 
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        binding.toolbar.setBackgroundColor(getThemeColor(Dashboard.this, R.attr.colorPrimary));
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-                });
-                binding.toolbar.startAnimation(animationSet);
-            }
-            binding.drawerLayout.setStatusBarBackgroundColor(getThemeColor(Dashboard.this, R.attr.colorPrimaryDark));
+            initSearchView();
         }
     }
 
-    private boolean isRtl(Resources resources) {
-        return resources.getConfiguration().getLayoutDirection() == View.LAYOUT_DIRECTION_RTL;
+    public void initSearchView() {
+        final SearchView searchView =
+                (SearchView) search_menu.findItem(R.id.action_filter_search).getActionView();
+
+        // Enable/Disable Submit button in the keyboard
+
+        searchView.setSubmitButtonEnabled(false);
+
+        // Change search close button image
+
+        ImageView closeButton = (ImageView) searchView.findViewById(R.id.search_close_btn);
+        closeButton.setImageResource(R.drawable.ic_back);
+
+
+        // set hint and the text colors
+
+        EditText txtSearch = ((EditText) searchView.findViewById(androidx.appcompat.R.id.search_src_text));
+        txtSearch.setHint("Search..");
+        txtSearch.setHintTextColor(Color.DKGRAY);
+        txtSearch.setTextColor(getResources().getColor(R.color.colorPrimary));
+
+
+        // set the cursor
+
+        AutoCompleteTextView searchTextView = (AutoCompleteTextView) searchView.findViewById((androidx.appcompat.R.id.search_src_text));
+        try {
+            Field mCursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
+            mCursorDrawableRes.setAccessible(true);
+            mCursorDrawableRes.set(searchTextView, R.drawable.search_cursor); //This sets the cursor resource ID to 0 or @null which will make it visible on white background
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                callSearch(query);
+                searchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                callSearch(newText);
+                return true;
+            }
+
+            public void callSearch(String query) {
+                //Do searching
+            }
+
+        });
+
     }
 
-    private static int getThemeColor(Context context, int id) {
-        Resources.Theme theme = context.getTheme();
-        TypedArray a = theme.obtainStyledAttributes(new int[]{id});
-        int result = a.getColor(0, 0);
-        a.recycle();
-        return result;
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
+        final View myView = findViewById(viewID);
+
+        int width = myView.getWidth();
+
+        if (posFromRight > 0)
+            width -= (posFromRight * getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material)) - (getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) / 2);
+        if (containsOverflow)
+            width -= getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material);
+
+        int cx = width;
+        int cy = myView.getHeight() / 2;
+
+        Animator anim;
+        if (isShow)
+            anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, (float) width);
+        else
+            anim = ViewAnimationUtils.createCircularReveal(myView, cx, cy, (float) width, 0);
+
+        anim.setDuration((long) 500);
+
+        // make the view invisible when the animation is done
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                if (!isShow) {
+                    super.onAnimationEnd(animation);
+                    myView.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        // make the view visible and start the animation
+        if (isShow)
+            myView.setVisibility(View.VISIBLE);
+
+        // start the animation
+        anim.start();
+
+
     }
 }

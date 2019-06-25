@@ -44,6 +44,11 @@
                 layout="@layout/content_dashboard"
                 tools:context="@{context}" />
 
+            <include
+                android:id="@+id/searchToolbar"
+                layout="@layout/search_toolbar"
+                android:visibility="invisible" />
+
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <com.google.android.material.navigation.NavigationView
