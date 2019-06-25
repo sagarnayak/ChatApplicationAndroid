@@ -32,22 +32,12 @@
                     android:background="?attr/colorPrimary"
                     app:contentInsetStartWithNavigation="0dp"
                     app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-                <View
-                    android:id="@+id/anchor_dropdown"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp" />
             </com.google.android.material.appbar.AppBarLayout>
 
             <include
                 android:id="@+id/content_dashboard"
                 layout="@layout/content_dashboard"
                 tools:context="@{context}" />
-
-            <include
-                android:id="@+id/searchToolbar"
-                layout="@layout/search_toolbar"
-                android:visibility="invisible" />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
