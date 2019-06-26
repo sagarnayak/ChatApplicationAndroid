@@ -15,7 +15,5 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context=".ui.dashboard.Dashboard"
-        tools:showIn="@layout/activity_dashboard">
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        tools:showIn="@layout/activity_dashboard"></androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

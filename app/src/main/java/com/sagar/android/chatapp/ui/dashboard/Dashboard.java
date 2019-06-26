@@ -25,12 +25,12 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.jakewharton.rxbinding3.appcompat.RxSearchView;
 import com.sagar.android.chatapp.R;
 import com.sagar.android.chatapp.core.Enums;
 import com.sagar.android.chatapp.core.URLs;
@@ -48,10 +48,15 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Field;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 
 public class Dashboard extends AppCompatActivity {
 
@@ -117,7 +122,7 @@ public class Dashboard extends AppCompatActivity {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 circleReveal(R.id.searchToolbar, 1, true, true);
             else
-                searchtollbar.setVisibility(View.VISIBLE);
+                binding.searchToolBarLayout.searchToolbar.setVisibility(View.VISIBLE);
 
             item_search.expandActionView();
             return true;
@@ -127,7 +132,10 @@ public class Dashboard extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (item_search.isActionViewExpanded()) {
+            item_search.collapseActionView();
+            return;
+        }
         finish();
     }
 
@@ -274,7 +282,9 @@ public class Dashboard extends AppCompatActivity {
         return true;
     }
 
-    private Toolbar searchtollbar;
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //Code for the search view
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     private Menu search_menu;
     private MenuItem item_search;
 
@@ -283,17 +293,16 @@ public class Dashboard extends AppCompatActivity {
         search view reference taken form
         https://github.com/jaisonfdo/SearchViewSample
          */
-        searchtollbar = binding.searchToolBarLayout.searchToolbar;
-        if (searchtollbar != null) {
-            searchtollbar.inflateMenu(R.menu.menu_search);
-            search_menu = searchtollbar.getMenu();
+        if (binding.searchToolBarLayout.searchToolbar != null) {
+            binding.searchToolBarLayout.searchToolbar.inflateMenu(R.menu.menu_search);
+            search_menu = binding.searchToolBarLayout.searchToolbar.getMenu();
 
-            searchtollbar.setNavigationOnClickListener(
+            binding.searchToolBarLayout.searchToolbar.setNavigationOnClickListener(
                     v -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                             circleReveal(R.id.searchToolbar, 1, true, false);
                         else
-                            searchtollbar.setVisibility(View.INVISIBLE);
+                            binding.searchToolBarLayout.searchToolbar.setVisibility(View.INVISIBLE);
                     });
 
             item_search = search_menu.findItem(R.id.action_filter_search);
@@ -312,7 +321,7 @@ public class Dashboard extends AppCompatActivity {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 circleReveal(R.id.searchToolbar, 1, true, false);
                             } else
-                                searchtollbar.setVisibility(View.INVISIBLE);
+                                binding.searchToolBarLayout.searchToolbar.setVisibility(View.INVISIBLE);
                             return true;
                         }
                     }
@@ -353,18 +362,20 @@ public class Dashboard extends AppCompatActivity {
 
         // set the cursor
 
-        @SuppressLint("CutPasteId") AutoCompleteTextView searchTextView = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        @SuppressLint("CutPasteId") AutoCompleteTextView searchTextView =
+                searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         try {
             Field mCursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
             mCursorDrawableRes.setAccessible(true);
-//            mCursorDrawableRes.set(searchTextView, R.drawable.search_cursor); //This sets the cursor resource ID to 0 or @null which will make it visible on white background
+//            mCursorDrawableRes.set(searchTextView, R.drawable.search_cursor);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        /*searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                logUtil.logV("text submit : " + query);
                 callSearch(query);
                 searchView.clearFocus();
                 return true;
@@ -372,6 +383,7 @@ public class Dashboard extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                logUtil.logV("text change : " + newText);
                 callSearch(newText);
                 return true;
             }
@@ -380,10 +392,52 @@ public class Dashboard extends AppCompatActivity {
                 //Do searching
             }
 
-        });
+        });*/
+
+        /*
+        this is the rx java implementation for the above function.
+         */
+        RxSearchView.queryTextChanges(
+                searchView
+        )
+                .map(
+                        (Function<CharSequence, CharSequence>) charSequence ->
+                                charSequence.toString().trim()
+                )
+                /*.filter(
+                        charSequence -> charSequence.length() != 0
+                )*/
+                .debounce(
+                        500, TimeUnit.MILLISECONDS
+                )
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<CharSequence>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(CharSequence charSequence) {
+                                logUtil.logV("rx java : " + charSequence);
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
 
     }
 
+    @SuppressLint("PrivateResource")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
         final View myView = binding.searchToolBarLayout.searchToolbar;
@@ -391,7 +445,9 @@ public class Dashboard extends AppCompatActivity {
         int width = myView.getWidth();
 
         if (posFromRight > 0)
-            width -= (posFromRight * getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material)) - (getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) / 2);
+            width -=
+                    (posFromRight * getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material))
+                            - (getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_material) / 2);
         if (containsOverflow)
             width -= getResources().getDimensionPixelSize(R.dimen.abc_action_button_min_width_overflow_material);
 
@@ -424,4 +480,5 @@ public class Dashboard extends AppCompatActivity {
         // start the animation
         anim.start();
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 }

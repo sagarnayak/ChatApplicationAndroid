@@ -652,8 +652,10 @@ public class Repository {
                                     notAuthorised();
                                 else if (responseBodyResponse.code() == 200) {
                                     try {
+                                        //noinspection ConstantConditions
                                         JSONObject jsonObject = new JSONObject(responseBodyResponse.body().string());
 
+                                        //noinspection ConstantConditions
                                         if (
                                                 !preferences.getString(
                                                         KeyWordsAndConstants.AVATAR_UPDATE_TIMESTAMP,
