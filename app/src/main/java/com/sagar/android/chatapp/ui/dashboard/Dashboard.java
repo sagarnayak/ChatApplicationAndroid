@@ -29,6 +29,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.jakewharton.rxbinding3.appcompat.RxSearchView;
 import com.sagar.android.chatapp.R;
@@ -36,6 +37,7 @@ import com.sagar.android.chatapp.core.Enums;
 import com.sagar.android.chatapp.core.URLs;
 import com.sagar.android.chatapp.databinding.ActivityDashboardBinding;
 import com.sagar.android.chatapp.model.Result;
+import com.sagar.android.chatapp.ui.dashboard.adapter.RoomListAdapter;
 import com.sagar.android.chatapp.ui.login.Login;
 import com.sagar.android.chatapp.ui.profile.Profile;
 import com.sagar.android.chatapp.ui.settings.Settings;
@@ -112,6 +114,8 @@ public class Dashboard extends AppCompatActivity {
         );
 
         setUpSearchToolBar();
+
+        setUpRoomList();
     }
 
     @Override
@@ -481,4 +485,13 @@ public class Dashboard extends AppCompatActivity {
         anim.start();
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void setUpRoomList() {
+        binding.contentDashboard.recyclerViewSearchResult.setLayoutManager(
+                new LinearLayoutManager(this)
+        );
+        binding.contentDashboard.recyclerViewSearchResult.setAdapter(
+                new RoomListAdapter(this)
+        );
+    }
 }

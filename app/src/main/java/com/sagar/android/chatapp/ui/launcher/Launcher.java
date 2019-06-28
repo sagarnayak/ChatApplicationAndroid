@@ -7,8 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.sagar.android.chatapp.R;
-import com.sagar.android.chatapp.ui.dashboard.Dashboard;
-import com.sagar.android.chatapp.ui.login.Login;
+import com.sagar.android.chatapp.ui.room.ChatRoom;
 
 import javax.inject.Inject;
 
@@ -34,10 +33,11 @@ public class Launcher extends AppCompatActivity {
     }
 
     private void checkAndProceedAccordingly() {
-        if (!viewModel.isLoggedIn())
+        /*if (!viewModel.isLoggedIn())
             startActivity(new Intent(this, Login.class));
         else
-            startActivity(new Intent(this, Dashboard.class));
+            startActivity(new Intent(this, Dashboard.class));*/
+        startActivity(new Intent(this, ChatRoom.class));
         finish();
     }
 }

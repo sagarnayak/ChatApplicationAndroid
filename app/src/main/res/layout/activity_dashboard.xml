@@ -49,6 +49,16 @@
                 layout="@layout/content_dashboard"
                 tools:context="@{context}" />
 
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/floatingActionButtonAddNewGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="16dp"
+                android:src="@android:drawable/ic_input_add"
+                android:tint="@android:color/white"
+                app:fabSize="auto"
+                app:layout_behavior=".ui.dashboard.behaviour.FabBehaviour" />
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <com.google.android.material.navigation.NavigationView
