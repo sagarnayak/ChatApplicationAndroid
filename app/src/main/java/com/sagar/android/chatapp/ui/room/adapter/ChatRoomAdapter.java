@@ -30,7 +30,7 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<ChatRoomAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return 2;
+        return 8;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
