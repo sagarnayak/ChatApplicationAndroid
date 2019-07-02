@@ -289,10 +289,10 @@ public class Profile extends AppCompatActivity {
 
     private void setPictureToUI(boolean shouldRefreshCache) {
         if (shouldRefreshCache)
-            picassoAuthenticated.invalidate(URLs.AVATAR_URL);
+            picassoAuthenticated.invalidate(URLs.MY_AVATAR_URL);
         picassoAuthenticated
                 .load(
-                        URLs.AVATAR_URL
+                        URLs.MY_AVATAR_URL
                 )
                 .transform(
                         new CircleTransformation()

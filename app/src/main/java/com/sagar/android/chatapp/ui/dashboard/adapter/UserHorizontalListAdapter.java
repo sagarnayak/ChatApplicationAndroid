@@ -6,14 +6,27 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.sagar.android.chatapp.core.URLs;
 import com.sagar.android.chatapp.databinding.MoreCountForUserHorListBinding;
 import com.sagar.android.chatapp.databinding.UserHorListItemBinding;
+import com.sagar.android.chatapp.model.User;
 import com.sagar.android.chatapp.util.CircleTransformation;
+import com.sagar.android.chatapp.util.TextDrawableUtil;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 public class UserHorizontalListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int USER = 1;
     private static final int COUNT = 2;
+
+    private static final int MAX_VISIBLE_USER = 5;
+
+    private ArrayList<User> users;
+
+    public UserHorizontalListAdapter(ArrayList<User> users) {
+        this.users = users;
+    }
 
     @NonNull
     @Override
@@ -42,22 +55,34 @@ public class UserHorizontalListAdapter extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof ViewHolderUser)
-            ((ViewHolderUser) holder).bind(position);
-        else if (holder instanceof ViewHolderMoreCount)
+        if (holder instanceof ViewHolderUser) {
+            ((ViewHolderUser) holder).bind(users.get(position));
+        } else if (holder instanceof ViewHolderMoreCount)
             ((ViewHolderMoreCount) holder).bind();
     }
 
     @Override
     public int getItemCount() {
-        return 4;
+        if (
+                users.size() < MAX_VISIBLE_USER + 1
+        ) {
+            return users.size();
+        } else {
+            return MAX_VISIBLE_USER + 1;
+        }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 3)
-            return COUNT;
-        return USER;
+        if (
+                users.size() < MAX_VISIBLE_USER + 1
+        ) {
+            return USER;
+        } else {
+            if (position < MAX_VISIBLE_USER)
+                return USER;
+            else return COUNT;
+        }
     }
 
     class ViewHolderUser extends RecyclerView.ViewHolder {
@@ -68,45 +93,24 @@ public class UserHorizontalListAdapter extends RecyclerView.Adapter<RecyclerView
             this.binding = binding;
         }
 
-        public void bind(int position) {
-            switch (position) {
-                case 0:
-                    Picasso.get()
-                            .load(
-                                    "https://randomuser.me/api/portraits/women/3.jpg"
+        public void bind(User user) {
+            //noinspection ConstantConditions
+            Picasso.get()
+                    .load(
+                            URLs.PROFILE_PICTURE_URL + user.getId()
+                    )
+                    .transform(
+                            new CircleTransformation()
+                    )
+                    .placeholder(
+                            TextDrawableUtil.getPlaceHolder(
+                                    user.getName(),
+                                    TextDrawableUtil.Shape.ROUND
                             )
-                            .transform(
-                                    new CircleTransformation()
-                            )
-                            .into(
-                                    binding.appcompatImageViewUserImage
-                            );
-                    break;
-                case 1:
-                    Picasso.get()
-                            .load(
-                                    "https://randomuser.me/api/portraits/women/4.jpg"
-                            )
-                            .transform(
-                                    new CircleTransformation()
-                            )
-                            .into(
-                                    binding.appcompatImageViewUserImage
-                            );
-                    break;
-                case 2:
-                    Picasso.get()
-                            .load(
-                                    "https://randomuser.me/api/portraits/women/5.jpg"
-                            )
-                            .transform(
-                                    new CircleTransformation()
-                            )
-                            .into(
-                                    binding.appcompatImageViewUserImage
-                            );
-                    break;
-            }
+                    )
+                    .into(
+                            binding.appcompatImageViewUserImage
+                    );
         }
     }
 
@@ -119,6 +123,11 @@ public class UserHorizontalListAdapter extends RecyclerView.Adapter<RecyclerView
         }
 
         public void bind() {
+            binding.textViewMoreCount.setText(
+                    String.valueOf(
+                            users.size() - MAX_VISIBLE_USER
+                    )
+            );
         }
     }
 }

@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -30,14 +31,18 @@ import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.jakewharton.rxbinding3.appcompat.RxSearchView;
 import com.sagar.android.chatapp.R;
 import com.sagar.android.chatapp.core.Enums;
+import com.sagar.android.chatapp.core.KeyWordsAndConstants;
 import com.sagar.android.chatapp.core.URLs;
 import com.sagar.android.chatapp.databinding.ActivityDashboardBinding;
 import com.sagar.android.chatapp.model.Result;
+import com.sagar.android.chatapp.model.Room;
 import com.sagar.android.chatapp.ui.dashboard.adapter.RoomListAdapter;
+import com.sagar.android.chatapp.ui.dashboard.adapter.RoomSearchListAdapter;
 import com.sagar.android.chatapp.ui.login.Login;
 import com.sagar.android.chatapp.ui.profile.Profile;
 import com.sagar.android.chatapp.ui.settings.Settings;
@@ -50,6 +55,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -80,6 +86,17 @@ public class Dashboard extends AppCompatActivity {
             viewModel.shouldClearCacheForAvatar();
         }
     };
+
+    private LinearLayoutManager linearLayoutManager;
+    private RoomListAdapter roomListAdapter;
+    private ArrayList<Room> allRoomsList;
+
+    private LinearLayoutManager linearLayoutManagerRoomSearchList;
+    private RoomSearchListAdapter roomSearchListAdapter;
+    private ArrayList<Room> roomSearchList;
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
+    private String searchString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +133,10 @@ public class Dashboard extends AppCompatActivity {
         setUpSearchToolBar();
 
         setUpRoomList();
+
+        getRoomList();
+
+        prepareSearchResultList();
     }
 
     @Override
@@ -194,10 +215,10 @@ public class Dashboard extends AppCompatActivity {
 
     private void setAvatarToUI(boolean shouldRefreshCache) {
         if (shouldRefreshCache)
-            picassoAuthenticated.invalidate(URLs.AVATAR_URL);
+            picassoAuthenticated.invalidate(URLs.MY_AVATAR_URL);
         picassoAuthenticated
                 .load(
-                        URLs.AVATAR_URL
+                        URLs.MY_AVATAR_URL
                 )
                 .transform(
                         new CircleTransformation()
@@ -235,6 +256,33 @@ public class Dashboard extends AppCompatActivity {
                         result -> {
                             if (result != null)
                                 processShouldClearPicassoCacheForAvatarResult(result);
+                        }
+                );
+
+        viewModel.mediatorLiveDataAllRooms
+                .observe(
+                        this,
+                        rooms -> {
+                            if (rooms != null)
+                                processAllRooms(rooms);
+                        }
+                );
+
+        viewModel.mediatorLiveDataAllRoomsError
+                .observe(
+                        this,
+                        result -> {
+                            if (result != null)
+                                processAllRoomError(result);
+                        }
+                );
+
+        viewModel.mediatorLiveDataRoomSearchResult
+                .observe(
+                        this,
+                        rooms -> {
+                            if (rooms != null)
+                                processRoomSearchResult(rooms);
                         }
                 );
     }
@@ -315,12 +363,14 @@ public class Dashboard extends AppCompatActivity {
                     new MenuItem.OnActionExpandListener() {
                         @Override
                         public boolean onMenuItemActionExpand(MenuItem menuItem) {
+                            initialiseSearchResult();
                             // Do something when expanded
                             return true;
                         }
 
                         @Override
                         public boolean onMenuItemActionCollapse(MenuItem menuItem) {
+                            hideSearchResultList();
                             // Do something when collapsed
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 circleReveal(R.id.searchToolbar, 1, true, false);
@@ -412,7 +462,7 @@ public class Dashboard extends AppCompatActivity {
                         charSequence -> charSequence.length() != 0
                 )*/
                 .debounce(
-                        500, TimeUnit.MILLISECONDS
+                        1000, TimeUnit.MILLISECONDS
                 )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -424,7 +474,7 @@ public class Dashboard extends AppCompatActivity {
 
                             @Override
                             public void onNext(CharSequence charSequence) {
-                                logUtil.logV("rx java : " + charSequence);
+                                searchRooms(charSequence);
                             }
 
                             @Override
@@ -486,12 +536,131 @@ public class Dashboard extends AppCompatActivity {
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private void getRoomList() {
+        viewModel.getAllRooms();
+    }
+
     private void setUpRoomList() {
+        linearLayoutManager = new LinearLayoutManager(this);
+        allRoomsList = new ArrayList<>();
+        roomListAdapter = new RoomListAdapter(
+                allRoomsList,
+                this
+        );
+        binding.contentDashboard.recyclerViewRoomList.setLayoutManager(
+                linearLayoutManager
+        );
+        binding.contentDashboard.recyclerViewRoomList.setAdapter(
+                roomListAdapter
+        );
+    }
+
+    private void processAllRooms(ArrayList<Room> rooms) {
+        allRoomsList.addAll(rooms);
+        roomListAdapter.notifyDataSetChanged();
+    }
+
+    private void processAllRoomError(Result result) {
+        if (result.getResult() == Enums.Result.FAIL) {
+            DialogUtil.showDialogWithMessage(
+                    this,
+                    result.getMessage()
+            );
+        }
+    }
+
+    private void prepareSearchResultList() {
+        roomSearchList = new ArrayList<>();
+        linearLayoutManagerRoomSearchList = new LinearLayoutManager(this);
+        roomSearchListAdapter = new RoomSearchListAdapter(
+                roomSearchList,
+                this
+        );
         binding.contentDashboard.recyclerViewSearchResult.setLayoutManager(
-                new LinearLayoutManager(this)
+                linearLayoutManagerRoomSearchList
         );
         binding.contentDashboard.recyclerViewSearchResult.setAdapter(
-                new RoomListAdapter(this)
+                roomSearchListAdapter
         );
+
+        binding.contentDashboard.recyclerViewSearchResult.addOnScrollListener(
+                new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(
+                            @NonNull RecyclerView recyclerView,
+                            int newState
+                    ) {
+                        super.onScrollStateChanged(recyclerView, newState);
+                    }
+
+                    @Override
+                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+                        int visibleItemCount = linearLayoutManagerRoomSearchList.getChildCount();
+                        int totalItemCount = linearLayoutManagerRoomSearchList.getItemCount();
+                        int firstVisibleItemPosition = linearLayoutManagerRoomSearchList.findFirstVisibleItemPosition();
+
+                        if (!isLoading && !isLastPage) {
+                            if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                                    && firstVisibleItemPosition >= 0
+                                    && totalItemCount >= KeyWordsAndConstants.ROOM_SEARCH_LIST_PAGE_SIZE) {
+                                searchRooms();
+                            }
+                        }
+                    }
+                }
+        );
+    }
+
+    private void initialiseSearchResult() {
+        roomSearchList.clear();
+        roomSearchListAdapter.notifyDataSetChanged();
+    }
+
+    private void showSearchResultList() {
+        binding.contentDashboard.recyclerViewSearchResult.setVisibility(View.VISIBLE);
+    }
+
+    private void hideSearchResultList() {
+        binding.contentDashboard.recyclerViewSearchResult.setVisibility(View.GONE);
+    }
+
+    private void searchRooms(CharSequence charSequence) {
+        searchString = charSequence.toString();
+
+        isLoading = false;
+        isLastPage = false;
+
+        initialiseSearchResult();
+
+        if (searchString.length() == 0) {
+            hideSearchResultList();
+        } else {
+            searchRooms();
+        }
+    }
+
+    private void searchRooms() {
+        isLoading = true;
+
+        viewModel.searchRooms(
+                searchString,
+                String.valueOf(
+                        KeyWordsAndConstants.ROOM_SEARCH_LIST_PAGE_SIZE
+                ),
+                String.valueOf(
+                        roomSearchList.size()
+                )
+        );
+    }
+
+    private void processRoomSearchResult(ArrayList<Room> rooms) {
+        showSearchResultList();
+        isLoading = false;
+        if (rooms.size() < KeyWordsAndConstants.ROOM_SEARCH_LIST_PAGE_SIZE)
+            isLastPage = true;
+
+        roomSearchList.addAll(rooms);
+        roomSearchListAdapter.notifyDataSetChanged();
     }
 }

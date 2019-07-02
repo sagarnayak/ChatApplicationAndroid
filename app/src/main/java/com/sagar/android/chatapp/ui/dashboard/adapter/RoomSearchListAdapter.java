@@ -2,6 +2,7 @@ package com.sagar.android.chatapp.ui.dashboard.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -14,11 +15,11 @@ import com.sagar.android.chatapp.util.OverlapDecoration;
 
 import java.util.ArrayList;
 
-public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.ViewHolder> {
+public class RoomSearchListAdapter extends RecyclerView.Adapter<RoomSearchListAdapter.ViewHolder> {
     private ArrayList<Room> rooms;
     private Context context;
 
-    public RoomListAdapter(ArrayList<Room> rooms, Context context) {
+    public RoomSearchListAdapter(ArrayList<Room> rooms, Context context) {
         this.rooms = rooms;
         this.context = context;
     }
@@ -57,6 +58,8 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.ViewHo
             binding.textViewRoomName.setText(
                     room.getName()
             );
+            binding.recyclerViewUsers.setLayoutManager(null);
+            binding.recyclerViewUsers.setAdapter(null);
             binding.recyclerViewUsers.setLayoutManager(
                     new LinearLayoutManager(
                             context,
@@ -64,13 +67,13 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.ViewHo
                             false
                     )
             );
+            binding.recyclerViewUsers.addItemDecoration(
+                    new OverlapDecoration()
+            );
             binding.recyclerViewUsers.setAdapter(
                     new UserHorizontalListAdapter(
                             room.getUsers()
                     )
-            );
-            binding.recyclerViewUsers.addItemDecoration(
-                    new OverlapDecoration()
             );
         }
     }

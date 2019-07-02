@@ -10,12 +10,14 @@ import android.content.SharedPreferences;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sagar.android.chatapp.core.Enums;
 import com.sagar.android.chatapp.core.KeyWordsAndConstants;
 import com.sagar.android.chatapp.model.FcmTokenData;
 import com.sagar.android.chatapp.model.LoginRequest;
 import com.sagar.android.chatapp.model.ResetPasswordRequest;
 import com.sagar.android.chatapp.model.Result;
+import com.sagar.android.chatapp.model.Room;
 import com.sagar.android.chatapp.model.UserData;
 import com.sagar.android.chatapp.model.UserSignUpRequest;
 import com.sagar.android.chatapp.repository.retrofit.ApiInterface;
@@ -27,6 +29,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -51,6 +54,11 @@ public class Repository {
     public MutableLiveData<Result> mutableLiveDataUpdateAvatarResult;
     public MutableLiveData<Result> mutableLiveDataShouldClearPicassoCacheForAvatar;
     public MutableLiveData<Result> mutableLiveDataLogoutAllResult;
+    public MutableLiveData<ArrayList<Room>> mutableLiveDataAllRooms;
+    public MutableLiveData<Result> mutableLiveDataAllRoomsError;
+    public MutableLiveData<ArrayList<Room>> mutableLiveDataRoomSearchResult;
+
+    private ArrayList<Disposable> searchRoomDisposablesList;
 
     public Repository(
             ApiInterface apiInterface,
@@ -71,6 +79,11 @@ public class Repository {
         mutableLiveDataUpdateAvatarResult = new MutableLiveData<>();
         mutableLiveDataShouldClearPicassoCacheForAvatar = new MutableLiveData<>();
         mutableLiveDataLogoutAllResult = new MutableLiveData<>();
+        mutableLiveDataAllRooms = new MutableLiveData<>();
+        mutableLiveDataAllRoomsError = new MutableLiveData<>();
+        mutableLiveDataRoomSearchResult = new MutableLiveData<>();
+
+        searchRoomDisposablesList = new ArrayList<>();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -798,6 +811,224 @@ public class Repository {
                             }
                         }
                 );
+    }
+
+    public void getAllRooms() {
+        apiInterface.getRooms(
+                getAuthToken(),
+                "", "", ""
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable disposable) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 404)
+                                    notAuthorised();
+                                else if (responseBodyResponse.code() == 200) {
+                                    try {
+                                        ArrayList<Room> rooms = new Gson().fromJson(
+                                                responseBodyResponse.body().string(),
+                                                new TypeToken<ArrayList<Room>>() {
+                                                }.getType()
+                                        );
+
+                                        mutableLiveDataAllRooms.postValue(
+                                                rooms
+                                        );
+
+                                        new Thread(
+                                                () -> {
+                                                    try {
+                                                        Thread.sleep(1000);
+                                                    } catch (InterruptedException e1) {
+                                                        e1.printStackTrace();
+                                                    }
+                                                    mutableLiveDataAllRooms.postValue(null);
+                                                }
+                                        ).start();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+
+                                        mutableLiveDataAllRoomsError.postValue(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(e)
+                                                )
+                                        );
+
+                                        new Thread(
+                                                () -> {
+                                                    try {
+                                                        Thread.sleep(1000);
+                                                    } catch (InterruptedException e1) {
+                                                        e1.printStackTrace();
+                                                    }
+                                                    mutableLiveDataAllRoomsError.postValue(null);
+                                                }
+                                        ).start();
+                                    }
+                                } else if (responseBodyResponse.code() == 204) {
+                                    mutableLiveDataAllRooms.postValue(
+                                            new ArrayList<>()
+                                    );
+
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e1) {
+                                                    e1.printStackTrace();
+                                                }
+                                                mutableLiveDataAllRooms.postValue(null);
+                                            }
+                                    ).start();
+                                } else {
+                                    mutableLiveDataAllRoomsError.postValue(
+                                            new Result(
+                                                    Enums.Result.FAIL,
+                                                    getErrorMessage(responseBodyResponse.errorBody())
+                                            )
+                                    );
+
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e1) {
+                                                    e1.printStackTrace();
+                                                }
+                                                mutableLiveDataAllRoomsError.postValue(null);
+                                            }
+                                    ).start();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable throwable) {
+                                mutableLiveDataAllRoomsError.postValue(
+                                        new Result(
+                                                Enums.Result.FAIL,
+                                                getErrorMessage(throwable)
+                                        )
+                                );
+
+                                new Thread(
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            mutableLiveDataAllRoomsError.postValue(null);
+                                        }
+                                ).start();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
+
+    public void searchRooms(
+            String searchString,
+            String limit,
+            String skip
+    ) {
+        disposeAllPendingRequest();
+        apiInterface.getRooms(
+                getAuthToken(),
+                searchString,
+                limit,
+                skip
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable disposable) {
+                                searchRoomDisposablesList.add(disposable);
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 404)
+                                    notAuthorised();
+                                else if (responseBodyResponse.code() == 200) {
+                                    try {
+                                        ArrayList<Room> rooms = new Gson().fromJson(
+                                                responseBodyResponse.body().string(),
+                                                new TypeToken<ArrayList<Room>>() {
+                                                }.getType()
+                                        );
+
+                                        mutableLiveDataRoomSearchResult.postValue(
+                                                rooms
+                                        );
+
+                                        new Thread(
+                                                () -> {
+                                                    try {
+                                                        Thread.sleep(1000);
+                                                    } catch (InterruptedException e1) {
+                                                        e1.printStackTrace();
+                                                    }
+                                                    mutableLiveDataRoomSearchResult.postValue(null);
+                                                }
+                                        ).start();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else if (responseBodyResponse.code() == 204) {
+
+                                    mutableLiveDataRoomSearchResult.postValue(
+                                            new ArrayList<>()
+                                    );
+
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e1) {
+                                                    e1.printStackTrace();
+                                                }
+                                                mutableLiveDataRoomSearchResult.postValue(null);
+                                            }
+                                    ).start();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable throwable) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
+
+    private void disposeAllPendingRequest() {
+        for (Disposable d :
+                searchRoomDisposablesList) {
+            if (!d.isDisposed())
+                d.dispose();
+        }
+
+        searchRoomDisposablesList.clear();
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
