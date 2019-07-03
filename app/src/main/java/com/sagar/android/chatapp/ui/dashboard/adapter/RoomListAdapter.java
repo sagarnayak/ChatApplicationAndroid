@@ -51,6 +51,10 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.ViewHo
         public ViewHolder(RoomListItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+
+            this.binding.recyclerViewUsers.addItemDecoration(
+                    new OverlapDecoration()
+            );
         }
 
         public void bind(Room room) {
@@ -68,9 +72,6 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.ViewHo
                     new UserHorizontalListAdapter(
                             room.getUsers()
                     )
-            );
-            binding.recyclerViewUsers.addItemDecoration(
-                    new OverlapDecoration()
             );
         }
     }

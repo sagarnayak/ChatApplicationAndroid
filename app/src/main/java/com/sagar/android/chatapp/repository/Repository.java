@@ -18,8 +18,11 @@ import com.sagar.android.chatapp.model.LoginRequest;
 import com.sagar.android.chatapp.model.ResetPasswordRequest;
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.Room;
+import com.sagar.android.chatapp.model.User;
 import com.sagar.android.chatapp.model.UserData;
 import com.sagar.android.chatapp.model.UserSignUpRequest;
+import com.sagar.android.chatapp.model.createRoomRequest;
+import com.sagar.android.chatapp.model.searchUserResuest;
 import com.sagar.android.chatapp.repository.retrofit.ApiInterface;
 import com.sagar.android.chatapp.ui.launcher.Launcher;
 import com.sagar.android.logutilmaster.LogUtil;
@@ -57,6 +60,8 @@ public class Repository {
     public MutableLiveData<ArrayList<Room>> mutableLiveDataAllRooms;
     public MutableLiveData<Result> mutableLiveDataAllRoomsError;
     public MutableLiveData<ArrayList<Room>> mutableLiveDataRoomSearchResult;
+    public MutableLiveData<ArrayList<User>> mutableLiveDataUserSearchResult;
+    public MutableLiveData<Result> mutableLiveDataCreateRoomResult;
 
     private ArrayList<Disposable> searchRoomDisposablesList;
 
@@ -82,6 +87,8 @@ public class Repository {
         mutableLiveDataAllRooms = new MutableLiveData<>();
         mutableLiveDataAllRoomsError = new MutableLiveData<>();
         mutableLiveDataRoomSearchResult = new MutableLiveData<>();
+        mutableLiveDataUserSearchResult = new MutableLiveData<>();
+        mutableLiveDataCreateRoomResult = new MutableLiveData<>();
 
         searchRoomDisposablesList = new ArrayList<>();
     }
@@ -833,6 +840,7 @@ public class Repository {
                                     notAuthorised();
                                 else if (responseBodyResponse.code() == 200) {
                                     try {
+                                        //noinspection ConstantConditions
                                         ArrayList<Room> rooms = new Gson().fromJson(
                                                 responseBodyResponse.body().string(),
                                                 new TypeToken<ArrayList<Room>>() {
@@ -944,7 +952,7 @@ public class Repository {
             String limit,
             String skip
     ) {
-        disposeAllPendingRequest();
+        disposeAllPendingSearchRoomRequest();
         apiInterface.getRooms(
                 getAuthToken(),
                 searchString,
@@ -966,6 +974,7 @@ public class Repository {
                                     notAuthorised();
                                 else if (responseBodyResponse.code() == 200) {
                                     try {
+                                        //noinspection ConstantConditions
                                         ArrayList<Room> rooms = new Gson().fromJson(
                                                 responseBodyResponse.body().string(),
                                                 new TypeToken<ArrayList<Room>>() {
@@ -1021,7 +1030,7 @@ public class Repository {
                 );
     }
 
-    private void disposeAllPendingRequest() {
+    private void disposeAllPendingSearchRoomRequest() {
         for (Disposable d :
                 searchRoomDisposablesList) {
             if (!d.isDisposed())
@@ -1029,6 +1038,165 @@ public class Repository {
         }
 
         searchRoomDisposablesList.clear();
+    }
+
+    public void searchUser(
+            String containing,
+            String limit,
+            String skip,
+            ArrayList<String> alreadyUsed
+    ) {
+        apiInterface.searchUser(
+                getAuthToken(),
+                new searchUserResuest(
+                        containing,
+                        limit,
+                        skip,
+                        alreadyUsed
+                )
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable disposable) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 404)
+                                    notAuthorised();
+                                else if (responseBodyResponse.code() == 200) {
+                                    try {
+                                        //noinspection ConstantConditions
+                                        ArrayList<User> users = new Gson().fromJson(
+                                                responseBodyResponse.body().string(),
+                                                new TypeToken<ArrayList<User>>() {
+                                                }.getType()
+                                        );
+
+                                        mutableLiveDataUserSearchResult.postValue(users);
+
+                                        new Thread(
+                                                () -> {
+                                                    try {
+                                                        Thread.sleep(1000);
+                                                    } catch (InterruptedException e1) {
+                                                        e1.printStackTrace();
+                                                    }
+                                                    mutableLiveDataUserSearchResult.postValue(null);
+                                                }
+                                        ).start();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else if (responseBodyResponse.code() == 204) {
+                                    mutableLiveDataUserSearchResult.postValue(
+                                            new ArrayList<>()
+                                    );
+
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e1) {
+                                                    e1.printStackTrace();
+                                                }
+                                                mutableLiveDataUserSearchResult.postValue(null);
+                                            }
+                                    ).start();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable throwable) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
+
+    public void createRoom(
+            String name,
+            ArrayList<String> members
+    ) {
+        apiInterface.createRoom(
+                getAuthToken(),
+                new createRoomRequest(
+                        name,
+                        members
+                )
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable disposable) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 404)
+                                    notAuthorised();
+                                else if (responseBodyResponse.code() == 200) {
+                                    mutableLiveDataCreateRoomResult.postValue(
+                                            new Result(
+                                                    Enums.Result.SUCCESS,
+                                                    ""
+                                            )
+                                    );
+
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e1) {
+                                                    e1.printStackTrace();
+                                                }
+                                                mutableLiveDataCreateRoomResult.postValue(null);
+                                            }
+                                    ).start();
+                                }else{
+                                    mutableLiveDataCreateRoomResult.postValue(
+                                            new Result(
+                                                    Enums.Result.SUCCESS,
+                                                    ""
+                                            )
+                                    );
+
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e1) {
+                                                    e1.printStackTrace();
+                                                }
+                                                mutableLiveDataCreateRoomResult.postValue(null);
+                                            }
+                                    ).start();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable throwable) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 

@@ -18,9 +18,13 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".ui.create_room.CreateRoom"
+            android:label="@string/title_activity_create_room"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
             android:name=".ui.room.ChatRoom"
             android:label="@string/title_activity_chat_room"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.settings.Settings"
             android:label="@string/title_activity_settings"

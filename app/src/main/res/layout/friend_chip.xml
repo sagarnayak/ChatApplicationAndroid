@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
+
+        <com.robertlevonyan.views.chip.Chip
+            android:id="@+id/chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusableInTouchMode="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:mcv_backgroundColor="@color/colorAccent"
+            app:mcv_closable="true"
+            app:mcv_closeColor="@android:color/white"
+            app:mcv_selectedBackgroundColor="@color/colorAccent"
+            app:mcv_textColor="@android:color/white" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

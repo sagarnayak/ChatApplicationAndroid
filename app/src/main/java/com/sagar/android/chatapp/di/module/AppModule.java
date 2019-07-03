@@ -1,5 +1,6 @@
 package com.sagar.android.chatapp.di.module;
 
+import com.sagar.android.chatapp.di.component.CreateRoomSubComponent;
 import com.sagar.android.chatapp.di.component.DashboardSubComponent;
 import com.sagar.android.chatapp.di.component.FirebaseMessagingServiceSubComponent;
 import com.sagar.android.chatapp.di.component.ForgotPasswordSubComponent;
@@ -22,7 +23,8 @@ import dagger.Module;
                 DashboardSubComponent.class,
                 ProfileSubComponent.class,
                 FirebaseMessagingServiceSubComponent.class,
-                SettingsSubComponent.class
+                SettingsSubComponent.class,
+                CreateRoomSubComponent.class
         }
 )
 public class AppModule {

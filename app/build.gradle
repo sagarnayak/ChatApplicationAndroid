@@ -106,5 +106,11 @@ dependencies {
 
     //fire base messaging
     implementation 'com.google.firebase:firebase-messaging:19.0.1'
+
+    //chip view
+    implementation 'com.robertlevonyan.view:MaterialChipView:1.2.5'
+
+    //layout manager for chip view
+    implementation 'com.google.android:flexbox:1.0.0'
 }
 apply plugin: 'com.google.gms.google-services'

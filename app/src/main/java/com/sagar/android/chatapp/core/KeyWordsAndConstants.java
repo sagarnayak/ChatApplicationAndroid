@@ -7,4 +7,5 @@ public class KeyWordsAndConstants {
     public static final String USER_DATA = "USER_DATA";
     public static final String AVATAR_UPDATE_TIMESTAMP = "AVATAR_UPDATE_TIMESTAMP";
     public static final int ROOM_SEARCH_LIST_PAGE_SIZE = 2;
+    public static final int USER_SEARCH_LIST_PAGE_SIZE = 10;
 }

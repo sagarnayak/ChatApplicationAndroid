@@ -41,6 +41,7 @@ import com.sagar.android.chatapp.core.URLs;
 import com.sagar.android.chatapp.databinding.ActivityDashboardBinding;
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.Room;
+import com.sagar.android.chatapp.ui.create_room.CreateRoom;
 import com.sagar.android.chatapp.ui.dashboard.adapter.RoomListAdapter;
 import com.sagar.android.chatapp.ui.dashboard.adapter.RoomSearchListAdapter;
 import com.sagar.android.chatapp.ui.login.Login;
@@ -162,6 +163,10 @@ public class Dashboard extends AppCompatActivity {
             return;
         }
         finish();
+    }
+
+    public void onClickCreateRoom(View view) {
+        gotoCreateRoom();
     }
 
     public void onClickProfile(View view) {
@@ -287,6 +292,13 @@ public class Dashboard extends AppCompatActivity {
                 );
     }
 
+    private void gotoCreateRoom() {
+        startActivity(
+                new Intent(this, CreateRoom.class)
+        );
+        finish();
+    }
+
     private void gotoProfile() {
         startActivity(
                 new Intent(this, Profile.class)
@@ -364,6 +376,7 @@ public class Dashboard extends AppCompatActivity {
                         @Override
                         public boolean onMenuItemActionExpand(MenuItem menuItem) {
                             initialiseSearchResult();
+                            hideFabIcon();
                             // Do something when expanded
                             return true;
                         }
@@ -371,6 +384,7 @@ public class Dashboard extends AppCompatActivity {
                         @Override
                         public boolean onMenuItemActionCollapse(MenuItem menuItem) {
                             hideSearchResultList();
+                            showFabIcon();
                             // Do something when collapsed
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                                 circleReveal(R.id.searchToolbar, 1, true, false);
@@ -553,6 +567,24 @@ public class Dashboard extends AppCompatActivity {
         binding.contentDashboard.recyclerViewRoomList.setAdapter(
                 roomListAdapter
         );
+        binding.contentDashboard.recyclerViewRoomList.addOnScrollListener(
+                new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
+                    }
+
+                    @Override
+                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+                        if (dy > 0 && binding.floatingActionButtonAddNewGroup.getVisibility() == View.VISIBLE) {
+                            binding.floatingActionButtonAddNewGroup.hide();
+                        } else if (dy < 0 && binding.floatingActionButtonAddNewGroup.getVisibility() != View.VISIBLE) {
+                            binding.floatingActionButtonAddNewGroup.show();
+                        }
+                    }
+                }
+        );
     }
 
     private void processAllRooms(ArrayList<Room> rooms) {
@@ -623,6 +655,14 @@ public class Dashboard extends AppCompatActivity {
 
     private void hideSearchResultList() {
         binding.contentDashboard.recyclerViewSearchResult.setVisibility(View.GONE);
+    }
+
+    private void showFabIcon() {
+        binding.floatingActionButtonAddNewGroup.show();
+    }
+
+    private void hideFabIcon() {
+        binding.floatingActionButtonAddNewGroup.hide();
     }
 
     private void searchRooms(CharSequence charSequence) {

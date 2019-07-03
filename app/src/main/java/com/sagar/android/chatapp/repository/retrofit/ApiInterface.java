@@ -4,6 +4,8 @@ import com.sagar.android.chatapp.model.FcmTokenData;
 import com.sagar.android.chatapp.model.LoginRequest;
 import com.sagar.android.chatapp.model.ResetPasswordRequest;
 import com.sagar.android.chatapp.model.UserSignUpRequest;
+import com.sagar.android.chatapp.model.createRoomRequest;
+import com.sagar.android.chatapp.model.searchUserResuest;
 
 import io.reactivex.Observable;
 import okhttp3.MultipartBody;
@@ -80,5 +82,17 @@ public interface ApiInterface {
             @Query("containing") String containing,
             @Query("limit") String limit,
             @Query("skip") String skip
+    );
+
+    @POST("searchUser")
+    Observable<Response<ResponseBody>> searchUser(
+            @Header("Authorization") String authHeader,
+            @Body searchUserResuest searchUserResuest
+    );
+
+    @POST("createRoom")
+    Observable<Response<ResponseBody>> createRoom(
+            @Header("Authorization") String authHeader,
+            @Body createRoomRequest createRoomRequest
     );
 }

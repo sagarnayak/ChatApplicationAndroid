@@ -2,7 +2,6 @@ package com.sagar.android.chatapp.ui.dashboard.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -52,6 +51,10 @@ public class RoomSearchListAdapter extends RecyclerView.Adapter<RoomSearchListAd
         public ViewHolder(RoomListItemBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
+
+            this.binding.recyclerViewUsers.addItemDecoration(
+                    new OverlapDecoration()
+            );
         }
 
         public void bind(Room room) {
@@ -66,9 +69,6 @@ public class RoomSearchListAdapter extends RecyclerView.Adapter<RoomSearchListAd
                             LinearLayoutManager.HORIZONTAL,
                             false
                     )
-            );
-            binding.recyclerViewUsers.addItemDecoration(
-                    new OverlapDecoration()
             );
             binding.recyclerViewUsers.setAdapter(
                     new UserHorizontalListAdapter(
