@@ -33,6 +33,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.gson.Gson;
 import com.jakewharton.rxbinding3.appcompat.RxSearchView;
 import com.sagar.android.chatapp.R;
 import com.sagar.android.chatapp.core.Enums;
@@ -46,6 +47,7 @@ import com.sagar.android.chatapp.ui.dashboard.adapter.RoomListAdapter;
 import com.sagar.android.chatapp.ui.dashboard.adapter.RoomSearchListAdapter;
 import com.sagar.android.chatapp.ui.login.Login;
 import com.sagar.android.chatapp.ui.profile.Profile;
+import com.sagar.android.chatapp.ui.room.ChatRoom;
 import com.sagar.android.chatapp.ui.settings.Settings;
 import com.sagar.android.chatapp.util.CircleTransformation;
 import com.sagar.android.chatapp.util.ColorUtil;
@@ -559,7 +561,8 @@ public class Dashboard extends AppCompatActivity {
         allRoomsList = new ArrayList<>();
         roomListAdapter = new RoomListAdapter(
                 allRoomsList,
-                this
+                this,
+                room -> gotoChat(room)
         );
         binding.contentDashboard.recyclerViewRoomList.setLayoutManager(
                 linearLayoutManager
@@ -702,5 +705,19 @@ public class Dashboard extends AppCompatActivity {
 
         roomSearchList.addAll(rooms);
         roomSearchListAdapter.notifyDataSetChanged();
+    }
+
+    private void gotoChat(Room room) {
+        startActivity(
+                new Intent(
+                        this,
+                        ChatRoom.class
+                )
+                        .putExtra(
+                                ChatRoom.DATA,
+                                new Gson().toJson(room)
+                        )
+        );
+        finish();
     }
 }

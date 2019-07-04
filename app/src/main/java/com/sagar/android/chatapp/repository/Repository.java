@@ -1165,11 +1165,11 @@ public class Repository {
                                                 mutableLiveDataCreateRoomResult.postValue(null);
                                             }
                                     ).start();
-                                }else{
+                                } else {
                                     mutableLiveDataCreateRoomResult.postValue(
                                             new Result(
-                                                    Enums.Result.SUCCESS,
-                                                    ""
+                                                    Enums.Result.FAIL,
+                                                    getErrorMessage(responseBodyResponse.errorBody())
                                             )
                                     );
 
@@ -1188,7 +1188,23 @@ public class Repository {
 
                             @Override
                             public void onError(Throwable throwable) {
+                                mutableLiveDataCreateRoomResult.postValue(
+                                        new Result(
+                                                Enums.Result.FAIL,
+                                                getErrorMessage(throwable)
+                                        )
+                                );
 
+                                new Thread(
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            mutableLiveDataCreateRoomResult.postValue(null);
+                                        }
+                                ).start();
                             }
 
                             @Override

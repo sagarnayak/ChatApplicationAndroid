@@ -32,12 +32,15 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.jakewharton.rxbinding3.appcompat.RxSearchView;
 import com.sagar.android.chatapp.R;
+import com.sagar.android.chatapp.core.Enums;
 import com.sagar.android.chatapp.core.KeyWordsAndConstants;
 import com.sagar.android.chatapp.databinding.ActivityCreateRoomBinding;
+import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.User;
 import com.sagar.android.chatapp.ui.create_room.adapter.FriendsAdapter;
 import com.sagar.android.chatapp.ui.create_room.adapter.SearchResultAdapter;
 import com.sagar.android.chatapp.ui.dashboard.Dashboard;
+import com.sagar.android.chatapp.util.DialogUtil;
 import com.sagar.android.chatapp.util.ProgressUtil;
 import com.sagar.android.chatapp.util.UiUtil;
 
@@ -354,6 +357,15 @@ public class CreateRoom extends AppCompatActivity {
                                 processUserListResponse(users);
                         }
                 );
+
+        viewModel.mediatorLiveDataCreateRoomResult
+                .observe(
+                        this,
+                        result -> {
+                            if (result != null)
+                                processCreateRoomResult(result);
+                        }
+                );
     }
 
     private void prepareSearchResultList() {
@@ -507,5 +519,43 @@ public class CreateRoom extends AppCompatActivity {
     }
 
     private void createRoom() {
+        UiUtil.hideSoftKeyboard(this);
+        if (
+                binding.contentCreateRoom.editTextRoomName.getText().length() == 0
+        ) {
+            DialogUtil.showDialogWithMessage(
+                    this,
+                    "Please enter room name"
+            );
+            return;
+        }
+        if (
+                selectedFriends.size() == 0
+        ) {
+            DialogUtil.showDialogWithMessage(
+                    this,
+                    "Please select the members"
+            );
+            return;
+        }
+        progressUtil.show();
+
+        viewModel.createRoom(
+                binding.contentCreateRoom.editTextRoomName.getText().toString(),
+                friendsAdapter.getAllIds()
+        );
+    }
+
+    private void processCreateRoomResult(Result result) {
+        progressUtil.hide();
+        if (result.getResult() == Enums.Result.FAIL) {
+            DialogUtil.showDialogWithMessage(
+                    this,
+                    result.getMessage()
+            );
+            return;
+        }
+
+        backPressed();
     }
 }

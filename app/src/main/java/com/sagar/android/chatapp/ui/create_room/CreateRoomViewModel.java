@@ -3,6 +3,7 @@ package com.sagar.android.chatapp.ui.create_room;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.User;
 import com.sagar.android.chatapp.repository.Repository;
 
@@ -12,11 +13,13 @@ public class CreateRoomViewModel extends ViewModel {
     private Repository repository;
 
     public MediatorLiveData<ArrayList<User>> mediatorLiveDataSearchUserResult;
+    public MediatorLiveData<Result> mediatorLiveDataCreateRoomResult;
 
     public CreateRoomViewModel(Repository repository) {
         this.repository = repository;
 
         mediatorLiveDataSearchUserResult = new MediatorLiveData<>();
+        mediatorLiveDataCreateRoomResult = new MediatorLiveData<>();
 
         bindToRepo();
     }
@@ -25,6 +28,11 @@ public class CreateRoomViewModel extends ViewModel {
         mediatorLiveDataSearchUserResult.addSource(
                 repository.mutableLiveDataUserSearchResult,
                 users -> mediatorLiveDataSearchUserResult.postValue(users)
+        );
+
+        mediatorLiveDataCreateRoomResult.addSource(
+                repository.mutableLiveDataCreateRoomResult,
+                result -> mediatorLiveDataCreateRoomResult.postValue(result)
         );
     }
 
@@ -36,6 +44,16 @@ public class CreateRoomViewModel extends ViewModel {
     ) {
         repository.searchUser(
                 containing, limit, skip, alreadyUsed
+        );
+    }
+
+    public void createRoom(
+            String name,
+            ArrayList<String> members
+    ) {
+        repository.createRoom(
+                name,
+                members
         );
     }
 }
