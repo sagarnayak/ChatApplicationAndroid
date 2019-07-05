@@ -562,7 +562,7 @@ public class Dashboard extends AppCompatActivity {
         roomListAdapter = new RoomListAdapter(
                 allRoomsList,
                 this,
-                room -> gotoChat(room)
+                this::gotoChat
         );
         binding.contentDashboard.recyclerViewRoomList.setLayoutManager(
                 linearLayoutManager
@@ -609,7 +609,8 @@ public class Dashboard extends AppCompatActivity {
         linearLayoutManagerRoomSearchList = new LinearLayoutManager(this);
         roomSearchListAdapter = new RoomSearchListAdapter(
                 roomSearchList,
-                this
+                this,
+                this::gotoChat
         );
         binding.contentDashboard.recyclerViewSearchResult.setLayoutManager(
                 linearLayoutManagerRoomSearchList

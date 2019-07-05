@@ -3,6 +3,7 @@ package com.sagar.android.chatapp.di.component;
 import android.app.Application;
 
 import com.sagar.android.chatapp.application.ApplicationClass;
+import com.sagar.android.chatapp.di.builder.ChatRoomActivityBuilder;
 import com.sagar.android.chatapp.di.builder.CreateRoomActivityBuilder;
 import com.sagar.android.chatapp.di.builder.DashboardActivityBuilder;
 import com.sagar.android.chatapp.di.builder.FirebaseMessagingServiceBuilder;
@@ -42,7 +43,8 @@ import dagger.android.AndroidInjectionModule;
                 ProfileActivityBuilder.class,
                 FirebaseMessagingServiceBuilder.class,
                 SettingsActivityBuilder.class,
-                CreateRoomActivityBuilder.class
+                CreateRoomActivityBuilder.class,
+                ChatRoomActivityBuilder.class
         }
 )
 public interface AppComponent {

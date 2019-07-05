@@ -9,12 +9,20 @@ import android.content.SharedPreferences;
 
 import androidx.lifecycle.MutableLiveData;
 
+import com.github.nkzawa.emitter.Emitter;
+import com.github.nkzawa.socketio.client.IO;
+import com.github.nkzawa.socketio.client.Socket;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sagar.android.chatapp.core.Enums;
 import com.sagar.android.chatapp.core.KeyWordsAndConstants;
+import com.sagar.android.chatapp.core.SocketEvent;
+import com.sagar.android.chatapp.core.URLs;
 import com.sagar.android.chatapp.model.FcmTokenData;
+import com.sagar.android.chatapp.model.GetChatsRequest;
+import com.sagar.android.chatapp.model.JoinRoomRequest;
 import com.sagar.android.chatapp.model.LoginRequest;
+import com.sagar.android.chatapp.model.NewMessageReq;
 import com.sagar.android.chatapp.model.ResetPasswordRequest;
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.Room;
@@ -33,6 +41,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -62,6 +71,10 @@ public class Repository {
     public MutableLiveData<ArrayList<Room>> mutableLiveDataRoomSearchResult;
     public MutableLiveData<ArrayList<User>> mutableLiveDataUserSearchResult;
     public MutableLiveData<Result> mutableLiveDataCreateRoomResult;
+    public MutableLiveData<Result> mutableLiveDataLeaveRoomResult;
+    public MutableLiveData<Room> mutableLiveDataJoinRoomResult;
+    public MutableLiveData<Result> mutableLiveDataJoinRoomError;
+    public MutableLiveData<Result> mutableLiveDataConnectedToSocket;
 
     private ArrayList<Disposable> searchRoomDisposablesList;
 
@@ -89,6 +102,10 @@ public class Repository {
         mutableLiveDataRoomSearchResult = new MutableLiveData<>();
         mutableLiveDataUserSearchResult = new MutableLiveData<>();
         mutableLiveDataCreateRoomResult = new MutableLiveData<>();
+        mutableLiveDataLeaveRoomResult = new MutableLiveData<>();
+        mutableLiveDataJoinRoomResult = new MutableLiveData<>();
+        mutableLiveDataJoinRoomError = new MutableLiveData<>();
+        mutableLiveDataConnectedToSocket = new MutableLiveData<>();
 
         searchRoomDisposablesList = new ArrayList<>();
     }
@@ -1214,6 +1231,214 @@ public class Repository {
                         }
                 );
     }
+
+    public void leaveRoom(String roomId) {
+        apiInterface.leaveRoom(
+                getAuthToken(),
+                roomId
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable disposable) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 404)
+                                    notAuthorised();
+                                else if (
+                                        responseBodyResponse.code() == 200
+                                ) {
+                                    mutableLiveDataLeaveRoomResult.postValue(
+                                            new Result(
+                                                    Enums.Result.SUCCESS,
+                                                    ""
+                                            )
+                                    );
+
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e1) {
+                                                    e1.printStackTrace();
+                                                }
+                                                mutableLiveDataLeaveRoomResult.postValue(null);
+                                            }
+                                    ).start();
+                                } else {
+                                    mutableLiveDataLeaveRoomResult.postValue(
+                                            new Result(
+                                                    Enums.Result.FAIL,
+                                                    getErrorMessage(
+                                                            responseBodyResponse.errorBody()
+                                                    )
+                                            )
+                                    );
+
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e1) {
+                                                    e1.printStackTrace();
+                                                }
+                                                mutableLiveDataLeaveRoomResult.postValue(null);
+                                            }
+                                    ).start();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable throwable) {
+                                mutableLiveDataLeaveRoomResult.postValue(
+                                        new Result(
+                                                Enums.Result.FAIL,
+                                                getErrorMessage(
+                                                        throwable
+                                                )
+                                        )
+                                );
+
+                                new Thread(
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            mutableLiveDataLeaveRoomResult.postValue(null);
+                                        }
+                                ).start();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
+
+    public void joinRoom(String roomId) {
+        apiInterface.joinRoom(
+                getAuthToken(),
+                new JoinRoomRequest(roomId)
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable disposable) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 404)
+                                    notAuthorised();
+                                else if (
+                                        responseBodyResponse.code() == 200
+                                ) {
+                                    try {
+                                        //noinspection ConstantConditions
+                                        mutableLiveDataJoinRoomResult.postValue(
+                                                new Gson().fromJson(
+                                                        responseBodyResponse.body().string(),
+                                                        Room.class
+                                                )
+                                        );
+
+                                        new Thread(
+                                                () -> {
+                                                    try {
+                                                        Thread.sleep(1000);
+                                                    } catch (InterruptedException e1) {
+                                                        e1.printStackTrace();
+                                                    }
+                                                    mutableLiveDataJoinRoomResult.postValue(null);
+                                                }
+                                        ).start();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        mutableLiveDataJoinRoomError.postValue(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(
+                                                                e
+                                                        )
+                                                )
+                                        );
+
+                                        new Thread(
+                                                () -> {
+                                                    try {
+                                                        Thread.sleep(1000);
+                                                    } catch (InterruptedException e1) {
+                                                        e1.printStackTrace();
+                                                    }
+                                                    mutableLiveDataJoinRoomError.postValue(null);
+                                                }
+                                        ).start();
+                                    }
+                                } else {
+                                    mutableLiveDataJoinRoomError.postValue(
+                                            new Result(
+                                                    Enums.Result.FAIL,
+                                                    getErrorMessage(
+                                                            responseBodyResponse.errorBody()
+                                                    )
+                                            )
+                                    );
+
+                                    new Thread(
+                                            () -> {
+                                                try {
+                                                    Thread.sleep(1000);
+                                                } catch (InterruptedException e1) {
+                                                    e1.printStackTrace();
+                                                }
+                                                mutableLiveDataJoinRoomError.postValue(null);
+                                            }
+                                    ).start();
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable throwable) {
+                                mutableLiveDataJoinRoomError.postValue(
+                                        new Result(
+                                                Enums.Result.FAIL,
+                                                getErrorMessage(
+                                                        throwable
+                                                )
+                                        )
+                                );
+
+                                new Thread(
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            mutableLiveDataJoinRoomError.postValue(null);
+                                        }
+                                ).start();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1336,6 +1561,162 @@ public class Repository {
         } catch (Exception e) {
             return "Something went wrong.";
         }
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //Sockets
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    private Socket socket;
+
+    public void prepareSockets() {
+        try {
+            if (socket == null) {
+                IO.Options options = new IO.Options();
+                options.forceNew = true;
+                options.query = "token=" + getAuthToken();
+                socket = IO.socket(URLs.BASE_URL, options);
+
+                socket.on(
+                        SocketEvent.CONNECT,
+                        new Emitter.Listener() {
+                            @Override
+                            public void call(Object... args) {
+                                logUtil.logV("socket connected");
+                            }
+                        }
+                );
+
+                socket.on(
+                        SocketEvent.DISCONNECT,
+                        new Emitter.Listener() {
+                            @Override
+                            public void call(Object... args) {
+                                logUtil.logV("socket disconnected");
+                            }
+                        }
+                );
+
+                socket.on(
+                        SocketEvent.ERROR,
+                        new Emitter.Listener() {
+                            @Override
+                            public void call(Object... args) {
+                                logUtil.logV("socket auth" + Arrays.toString(args));
+                                for (Object obj :
+                                        args) {
+                                    if (String.valueOf(obj).contains("auth error")) {
+                                        notAuthorised();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                );
+
+                socket.on(
+                        SocketEvent.YOU_ARE_CONNECTED,
+                        new Emitter.Listener() {
+                            @Override
+                            public void call(Object... objects) {
+                                connectedToSocket();
+                            }
+                        }
+                );
+
+                socket.on(
+                        SocketEvent.GET_CHAT_DATA,
+                        new Emitter.Listener() {
+                            @Override
+                            public void call(Object... args) {
+                                logUtil.logV("Server : " + Arrays.toString(args));
+                            }
+                        }
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            if (socket.connected())
+                return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            socket.connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logUtil.logV("socket connection failed : " + e.toString());
+        }
+    }
+
+    private void connectedToSocket() {
+        mutableLiveDataConnectedToSocket.postValue(
+                new Result()
+        );
+
+        new Thread(
+                () -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
+                    mutableLiveDataConnectedToSocket.postValue(null);
+                }
+        ).start();
+    }
+
+    public void disconnectSocket() {
+        try {
+            socket.disconnect();
+            socket.off();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getChatData(
+            String limit,
+            String skip,
+            String roomId
+    ) {
+        if (socket == null || !socket.connected())
+            return;
+        socket.emit(
+                SocketEvent.GET_CHAT_DATA,
+                new Gson().toJson(
+                        new GetChatsRequest(
+                                limit, skip, roomId
+                        )
+                )
+        );
+    }
+
+    public void sendMessage(
+            String message,
+            String roomId
+    ) {
+        socket.emit(
+                SocketEvent.SEND_NEW_MESSAGE,
+                new Gson().toJson(
+                        new NewMessageReq(
+                                message,
+                                roomId
+                        )
+                )
+        );
+    }
+
+    public void joinRoomSocket(
+            String roomId
+    ) {
+        socket.emit(
+                SocketEvent.JOIN_ROOM,
+                roomId
+        );
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 }

@@ -15,12 +15,18 @@ import com.sagar.android.chatapp.util.OverlapDecoration;
 import java.util.ArrayList;
 
 public class RoomSearchListAdapter extends RecyclerView.Adapter<RoomSearchListAdapter.ViewHolder> {
+    public interface CallBack {
+        void roomSelected(Room room);
+    }
+
     private ArrayList<Room> rooms;
     private Context context;
+    private CallBack callBack;
 
-    public RoomSearchListAdapter(ArrayList<Room> rooms, Context context) {
+    public RoomSearchListAdapter(ArrayList<Room> rooms, Context context, CallBack callBack) {
         this.rooms = rooms;
         this.context = context;
+        this.callBack = callBack;
     }
 
     @NonNull
@@ -74,6 +80,9 @@ public class RoomSearchListAdapter extends RecyclerView.Adapter<RoomSearchListAd
                     new UserHorizontalListAdapter(
                             room.getUsers()
                     )
+            );
+            binding.container.setOnClickListener(
+                    view -> callBack.roomSelected(room)
             );
         }
     }
