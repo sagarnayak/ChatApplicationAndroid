@@ -3,10 +3,13 @@ package com.sagar.android.chatapp.ui.room;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.sagar.android.chatapp.model.Chat;
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.Room;
 import com.sagar.android.chatapp.model.UserData;
 import com.sagar.android.chatapp.repository.Repository;
+
+import java.util.ArrayList;
 
 public class ChatRoomViewModel extends ViewModel {
     private Repository repository;
@@ -15,6 +18,7 @@ public class ChatRoomViewModel extends ViewModel {
     public MediatorLiveData<Room> mediatorLiveDataJoinRoomResult;
     public MediatorLiveData<Result> mediatorLiveDataJoinRoomError;
     public MediatorLiveData<Result> mediatorLiveDataConnectedToSocket;
+    public MediatorLiveData<ArrayList<Chat>> mediatorLiveDataChats;
 
     public ChatRoomViewModel(Repository repository) {
         this.repository = repository;
@@ -23,6 +27,7 @@ public class ChatRoomViewModel extends ViewModel {
         mediatorLiveDataJoinRoomResult = new MediatorLiveData<>();
         mediatorLiveDataJoinRoomError = new MediatorLiveData<>();
         mediatorLiveDataConnectedToSocket = new MediatorLiveData<>();
+        mediatorLiveDataChats = new MediatorLiveData<>();
 
         bindToRepo();
     }
@@ -46,6 +51,11 @@ public class ChatRoomViewModel extends ViewModel {
         mediatorLiveDataConnectedToSocket.addSource(
                 repository.mutableLiveDataConnectedToSocket,
                 result -> mediatorLiveDataConnectedToSocket.postValue(result)
+        );
+
+        mediatorLiveDataChats.addSource(
+                repository.mutableLiveDataChats,
+                chats -> mediatorLiveDataChats.postValue(chats)
         );
     }
 

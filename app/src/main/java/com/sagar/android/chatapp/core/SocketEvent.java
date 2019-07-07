@@ -8,4 +8,6 @@ public class SocketEvent {
     public static final String SEND_NEW_MESSAGE = "sendNewMessage";
     public static final String JOIN_ROOM = "join";
     public static final String YOU_ARE_CONNECTED = "youAreConnected";
+    public static final String NEW_MESSAGE = "newMessage";
+    public static final String NEW_MESSAGES = "newMessages";
 }

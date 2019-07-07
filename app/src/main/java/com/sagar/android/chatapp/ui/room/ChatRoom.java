@@ -7,15 +7,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 import com.sagar.android.chatapp.R;
 import com.sagar.android.chatapp.core.Enums;
+import com.sagar.android.chatapp.core.KeyWordsAndConstants;
 import com.sagar.android.chatapp.databinding.ActivityChatRoomBinding;
 import com.sagar.android.chatapp.model.Chat;
 import com.sagar.android.chatapp.model.Result;
@@ -53,7 +56,6 @@ public class ChatRoom extends AppCompatActivity {
     private ActivityChatRoomBinding binding;
     private ChatRoomViewModel viewModel;
     private MenuItem menuItemLeave;
-    private ArrayList<Chat> chats;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,27 +85,7 @@ public class ChatRoom extends AppCompatActivity {
 
         bindToViewModel();
 
-        binding.contentChatRoom.recyclerViewChats.setLayoutManager(
-                new LinearLayoutManager(this)
-        );
-
-        binding.contentChatRoom.recyclerViewChats.setAdapter(
-                new ChatRoomAdapter()
-        );
-
-        new Handler().postDelayed(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        viewModel.getChatData(
-                                "12",
-                                "0",
-                                "534grgeg"
-                        );
-                    }
-                },
-                5000
-        );
+        prepareChatList();
     }
 
     @Override
@@ -182,8 +164,17 @@ public class ChatRoom extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result!=null)
+                            if (result != null)
                                 processConnectedToSocketResponse();
+                        }
+                );
+
+        viewModel.mediatorLiveDataChats
+                .observe(
+                        this,
+                        chats -> {
+                            if (chats != null)
+                                gotNewChats(chats);
                         }
                 );
     }
@@ -298,14 +289,135 @@ public class ChatRoom extends AppCompatActivity {
         );
     }
 
-    private void processConnectedToSocketResponse(){
+    private void processConnectedToSocketResponse() {
         viewModel.joinRoomSocket(room.getId());
+
+        if (chats.size() != 0)
+            return;
+        getChats();
     }
 
     private void sendMessage(String message) {
         viewModel.sendMessage(
                 message,
                 room.getId()
+        );
+    }
+
+    private LinearLayoutManager linearLayoutManager;
+    private ChatRoomAdapter adapter;
+    private ArrayList<Chat> chats;
+    private boolean canScrollToBottom = true;
+    private boolean isLastPage = false;
+    private boolean isLoading = false;
+
+    private void prepareChatList() {
+        linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
+
+        chats = new ArrayList<>();
+
+        adapter = new ChatRoomAdapter(
+                chats,
+                picasso,
+                viewModel.getUserData()
+        );
+
+        binding.contentChatRoom.recyclerViewChats.setLayoutManager(
+                linearLayoutManager
+        );
+        binding.contentChatRoom.recyclerViewChats.setAdapter(
+                adapter
+        );
+        binding.contentChatRoom.recyclerViewChats.setItemAnimator(
+                new DefaultItemAnimator()
+        );
+
+        binding.contentChatRoom.recyclerViewChats.addOnScrollListener(
+                new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
+
+                        if (
+                                !recyclerView.canScrollVertically(1) &&
+                                        newState == RecyclerView.SCROLL_STATE_IDLE
+                        ) {
+                            canScrollToBottom = true;
+                        } else {
+                            canScrollToBottom = false;
+                        }
+                    }
+
+                    @Override
+                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                        super.onScrolled(recyclerView, dx, dy);
+                        int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
+
+                        if (!isLoading && !isLastPage) {
+                            if (
+                                    firstVisibleItemPosition == 0
+                            ) {
+                                getChats();
+                            }
+                        }
+                    }
+                }
+        );
+    }
+
+    private void getChats() {
+        isLoading = true;
+
+        viewModel.getChatData(
+                String.valueOf(
+                        KeyWordsAndConstants.CHAT_LIST_PAGE_SIZE
+                ),
+                String.valueOf(
+                        chats.size()
+                ),
+                room.getId()
+        );
+    }
+
+    private void gotNewChats(ArrayList<Chat> chats) {
+        isLoading = false;
+
+        if (chats.size() < KeyWordsAndConstants.CHAT_LIST_PAGE_SIZE)
+            isLastPage = true;
+
+        for (Chat c :
+                chats) {
+            if (this.chats.size() == 0)
+                this.chats.add(c);
+            else {
+                int indexToInsert=-1;
+                for (Chat chat :
+                        this.chats) {
+                    if (
+                            c.getCalendarCreated().getTimeInMillis()>
+                                    chat.getCalendarCreated().getTimeInMillis()
+                    ){
+                        indexToInsert=this.chats.indexOf(chat);
+                        break;
+                    }
+                }
+                if (indexToInsert!=-1)
+                    this.chats.add(indexToInsert,c);
+            }
+        }
+
+        adapter.notifyDataSetChanged();
+
+        if (!canScrollToBottom)
+            return;
+        if (this.chats.size() == 0)
+            return;
+        new Handler().postDelayed(
+                () -> binding.contentChatRoom.recyclerViewChats.smoothScrollToPosition(
+                        ChatRoom.this.chats.size() - 1
+                ),
+                500
         );
     }
 }

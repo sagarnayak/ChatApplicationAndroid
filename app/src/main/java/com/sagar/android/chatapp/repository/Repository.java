@@ -18,6 +18,7 @@ import com.sagar.android.chatapp.core.Enums;
 import com.sagar.android.chatapp.core.KeyWordsAndConstants;
 import com.sagar.android.chatapp.core.SocketEvent;
 import com.sagar.android.chatapp.core.URLs;
+import com.sagar.android.chatapp.model.Chat;
 import com.sagar.android.chatapp.model.FcmTokenData;
 import com.sagar.android.chatapp.model.GetChatsRequest;
 import com.sagar.android.chatapp.model.JoinRoomRequest;
@@ -75,6 +76,7 @@ public class Repository {
     public MutableLiveData<Room> mutableLiveDataJoinRoomResult;
     public MutableLiveData<Result> mutableLiveDataJoinRoomError;
     public MutableLiveData<Result> mutableLiveDataConnectedToSocket;
+    public MutableLiveData<ArrayList<Chat>> mutableLiveDataChats;
 
     private ArrayList<Disposable> searchRoomDisposablesList;
 
@@ -106,6 +108,7 @@ public class Repository {
         mutableLiveDataJoinRoomResult = new MutableLiveData<>();
         mutableLiveDataJoinRoomError = new MutableLiveData<>();
         mutableLiveDataConnectedToSocket = new MutableLiveData<>();
+        mutableLiveDataChats = new MutableLiveData<>();
 
         searchRoomDisposablesList = new ArrayList<>();
     }
@@ -1625,11 +1628,23 @@ public class Repository {
                 );
 
                 socket.on(
-                        SocketEvent.GET_CHAT_DATA,
+                        SocketEvent.NEW_MESSAGE,
                         new Emitter.Listener() {
                             @Override
                             public void call(Object... args) {
-                                logUtil.logV("Server : " + Arrays.toString(args));
+                                logUtil.logV("got new message : " + Arrays.toString(args));
+                                gotNewChat(args);
+                            }
+                        }
+                );
+
+                socket.on(
+                        SocketEvent.NEW_MESSAGES,
+                        new Emitter.Listener() {
+                            @Override
+                            public void call(Object... args) {
+                                logUtil.logV("got new messages : " + Arrays.toString(args));
+                                gotNewChats(args);
                             }
                         }
                 );
@@ -1717,6 +1732,48 @@ public class Repository {
                 SocketEvent.JOIN_ROOM,
                 roomId
         );
+    }
+
+    public void gotNewChat(Object... chats) {
+        ArrayList<Chat> chatToSend = new Gson().fromJson(
+                Arrays.toString(chats),
+                new TypeToken<ArrayList<Chat>>() {
+                }.getType()
+        );
+
+        mutableLiveDataChats.postValue(chatToSend);
+
+        new Thread(
+                () -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
+                    mutableLiveDataChats.postValue(null);
+                }
+        ).start();
+    }
+
+    public void gotNewChats(Object... chats) {
+        ArrayList<ArrayList<Chat>> result = new Gson().fromJson(
+                Arrays.toString(chats),
+                new TypeToken<ArrayList<ArrayList<Chat>>>() {
+                }.getType()
+        );
+
+        mutableLiveDataChats.postValue(result.get(0));
+
+        new Thread(
+                () -> {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
+                    mutableLiveDataChats.postValue(null);
+                }
+        ).start();
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 }
