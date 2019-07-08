@@ -81,11 +81,11 @@ public class ChatRoom extends AppCompatActivity {
 
         getDataFromIntent();
 
+        prepareChatList();
+
         setUpUI();
 
         bindToViewModel();
-
-        prepareChatList();
     }
 
     @Override
@@ -205,7 +205,6 @@ public class ChatRoom extends AppCompatActivity {
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private boolean isUserInRoom() {
         boolean inRoom = false;
-        UserData userData = viewModel.getUserData();
         for (User user :
                 room.getUsers()) {
             if (user.getId().equalsIgnoreCase(userData.getUser().getId())) {
@@ -310,17 +309,22 @@ public class ChatRoom extends AppCompatActivity {
     private boolean canScrollToBottom = true;
     private boolean isLastPage = false;
     private boolean isLoading = false;
+    private boolean isThisMyMesssage = false;
+    private UserData userData;
 
     private void prepareChatList() {
+        userData = viewModel.getUserData();
+
         linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setStackFromEnd(true);
+        linearLayoutManager.setReverseLayout(true);
+        linearLayoutManager.setItemPrefetchEnabled(true);
 
         chats = new ArrayList<>();
 
         adapter = new ChatRoomAdapter(
                 chats,
                 picasso,
-                viewModel.getUserData()
+                userData
         );
 
         binding.contentChatRoom.recyclerViewChats.setLayoutManager(
@@ -352,12 +356,15 @@ public class ChatRoom extends AppCompatActivity {
                     @Override
                     public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                         super.onScrolled(recyclerView, dx, dy);
+
+                        int visibleItemCount = linearLayoutManager.getChildCount();
+                        int totalItemCount = linearLayoutManager.getItemCount();
                         int firstVisibleItemPosition = linearLayoutManager.findFirstVisibleItemPosition();
 
                         if (!isLoading && !isLastPage) {
-                            if (
-                                    firstVisibleItemPosition == 0
-                            ) {
+                            if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                                    && firstVisibleItemPosition >= 0
+                                    && totalItemCount >= KeyWordsAndConstants.CHAT_LIST_PAGE_SIZE) {
                                 getChats();
                             }
                         }
@@ -386,38 +393,60 @@ public class ChatRoom extends AppCompatActivity {
         if (chats.size() < KeyWordsAndConstants.CHAT_LIST_PAGE_SIZE)
             isLastPage = true;
 
+        if (
+                chats.size() == 1 &&
+                        chats.get(0).getAuthorDetail().getId().equalsIgnoreCase(
+                                userData.getUser().getId()
+                        )
+        )
+            isThisMyMesssage = true;
+
         for (Chat c :
                 chats) {
             if (this.chats.size() == 0)
                 this.chats.add(c);
             else {
-                int indexToInsert=-1;
+                int indexToInsert = -1;
                 for (Chat chat :
                         this.chats) {
                     if (
-                            c.getCalendarCreated().getTimeInMillis()>
+                            c.getCalendarCreated().getTimeInMillis() >
                                     chat.getCalendarCreated().getTimeInMillis()
-                    ){
-                        indexToInsert=this.chats.indexOf(chat);
+                    ) {
+                        indexToInsert = this.chats.indexOf(chat);
                         break;
                     }
                 }
-                if (indexToInsert!=-1)
-                    this.chats.add(indexToInsert,c);
+                if (indexToInsert != -1)
+                    this.chats.add(indexToInsert, c);
+                else
+                    this.chats.add(c);
             }
         }
 
         adapter.notifyDataSetChanged();
 
-        if (!canScrollToBottom)
-            return;
-        if (this.chats.size() == 0)
-            return;
-        new Handler().postDelayed(
-                () -> binding.contentChatRoom.recyclerViewChats.smoothScrollToPosition(
-                        ChatRoom.this.chats.size() - 1
-                ),
-                500
-        );
+        if (
+                isThisMyMesssage
+        ) {
+            isThisMyMesssage = false;
+            new Handler().postDelayed(
+                    () -> binding.contentChatRoom.recyclerViewChats.smoothScrollToPosition(
+                            0
+                    ),
+                    500
+            );
+        } else {
+            if (!canScrollToBottom)
+                return;
+            if (this.chats.size() == 0)
+                return;
+            new Handler().postDelayed(
+                    () -> binding.contentChatRoom.recyclerViewChats.smoothScrollToPosition(
+                            0
+                    ),
+                    500
+            );
+        }
     }
 }

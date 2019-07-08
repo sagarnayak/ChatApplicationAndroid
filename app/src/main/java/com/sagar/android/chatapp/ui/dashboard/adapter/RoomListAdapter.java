@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.sagar.android.chatapp.databinding.RoomListItemBinding;
 import com.sagar.android.chatapp.model.Room;
 import com.sagar.android.chatapp.util.OverlapDecoration;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -21,11 +22,13 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.ViewHo
 
     private ArrayList<Room> rooms;
     private Context context;
+    private Picasso picasso;
     private CallBack callBack;
 
-    public RoomListAdapter(ArrayList<Room> rooms, Context context, CallBack callBack) {
+    public RoomListAdapter(ArrayList<Room> rooms, Context context, Picasso picasso, CallBack callBack) {
         this.rooms = rooms;
         this.context = context;
+        this.picasso = picasso;
         this.callBack = callBack;
     }
 
@@ -76,7 +79,8 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.ViewHo
             );
             binding.recyclerViewUsers.setAdapter(
                     new UserHorizontalListAdapter(
-                            room.getUsers()
+                            room.getUsers(),
+                            picasso
                     )
             );
             binding.container.setOnClickListener(

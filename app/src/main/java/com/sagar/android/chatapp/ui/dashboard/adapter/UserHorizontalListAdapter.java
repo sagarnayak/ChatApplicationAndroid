@@ -23,9 +23,11 @@ public class UserHorizontalListAdapter extends RecyclerView.Adapter<RecyclerView
     private static final int MAX_VISIBLE_USER = 5;
 
     private ArrayList<User> users;
+    private Picasso picasso;
 
-    public UserHorizontalListAdapter(ArrayList<User> users) {
+    public UserHorizontalListAdapter(ArrayList<User> users, Picasso picasso) {
         this.users = users;
+        this.picasso = picasso;
     }
 
     @NonNull
@@ -95,7 +97,7 @@ public class UserHorizontalListAdapter extends RecyclerView.Adapter<RecyclerView
 
         public void bind(User user) {
             //noinspection ConstantConditions
-            Picasso.get()
+            picasso
                     .load(
                             URLs.PROFILE_PICTURE_URL + user.getId()
                     )

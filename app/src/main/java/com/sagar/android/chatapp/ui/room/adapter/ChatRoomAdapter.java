@@ -77,17 +77,18 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     class ViewHolderLeft extends RecyclerView.ViewHolder {
         private ChatBubbleLeftBinding binding;
 
-        public ViewHolderLeft(ChatBubbleLeftBinding binding) {
+        ViewHolderLeft(ChatBubbleLeftBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
 
+        @SuppressLint("SetTextI18n")
         public void bind(Chat chat, int position) {
             if (
-                    position == 0 ||
+                    (position + 1) == chats.size() ||
                             (
                                     !chat.getAuthorDetail().getId().equals(
-                                            chats.get(position - 1).getAuthorDetail().getId()
+                                            chats.get(position + 1).getAuthorDetail().getId()
                                     )
                             )
             ) {
@@ -96,7 +97,7 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 //noinspection ConstantConditions
                 picasso
                         .load(
-                                URLs.MY_AVATAR_URL
+                                URLs.PROFILE_PICTURE_URL + chat.getAuthorDetail().getId()
                         )
                         .transform(
                                 new CircleTransformation()
@@ -118,18 +119,18 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 binding.textViewUserName.setVisibility(View.GONE);
             }
             if (
-                    position == 0 ||
+                    (position + 1) == chats.size() ||
                             (
                                     chat.getCalendarCreated().get(Calendar.DATE) !=
-                                            chats.get(position - 1).getCalendarCreated().get(Calendar.DATE)
+                                            chats.get(position + 1).getCalendarCreated().get(Calendar.DATE)
                             ) ||
                             (
                                     chat.getCalendarCreated().get(Calendar.MONTH) !=
-                                            chats.get(position - 1).getCalendarCreated().get(Calendar.MONTH)
+                                            chats.get(position + 1).getCalendarCreated().get(Calendar.MONTH)
                             ) ||
                             (
                                     chat.getCalendarCreated().get(Calendar.YEAR) !=
-                                            chats.get(position - 1).getCalendarCreated().get(Calendar.YEAR)
+                                            chats.get(position + 1).getCalendarCreated().get(Calendar.YEAR)
                             )
             ) {
                 binding.textViewDate.setVisibility(View.VISIBLE);
@@ -150,7 +151,7 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     class ViewHolderRight extends RecyclerView.ViewHolder {
         private ChatBubbleRightBinding binding;
 
-        public ViewHolderRight(ChatBubbleRightBinding binding) {
+        ViewHolderRight(ChatBubbleRightBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
         }
@@ -158,10 +159,10 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         @SuppressLint("SetTextI18n")
         public void bind(Chat chat, int position) {
             if (
-                    position == 0 ||
+                    (position + 1) == chats.size() ||
                             (
                                     !chat.getAuthorDetail().getId().equals(
-                                            chats.get(position - 1).getAuthorDetail().getId()
+                                            chats.get(position + 1).getAuthorDetail().getId()
                                     )
                             )
             ) {
@@ -170,7 +171,7 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 //noinspection ConstantConditions
                 picasso
                         .load(
-                                URLs.MY_AVATAR_URL
+                                URLs.PROFILE_PICTURE_URL + chat.getAuthorDetail().getId()
                         )
                         .transform(
                                 new CircleTransformation()
@@ -192,18 +193,18 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 binding.textViewUserName.setVisibility(View.GONE);
             }
             if (
-                    position == 0 ||
+                    (position + 1) == chats.size() ||
                             (
                                     chat.getCalendarCreated().get(Calendar.DATE) !=
-                                            chats.get(position - 1).getCalendarCreated().get(Calendar.DATE)
+                                            chats.get(position + 1).getCalendarCreated().get(Calendar.DATE)
                             ) ||
                             (
                                     chat.getCalendarCreated().get(Calendar.MONTH) !=
-                                            chats.get(position - 1).getCalendarCreated().get(Calendar.MONTH)
+                                            chats.get(position + 1).getCalendarCreated().get(Calendar.MONTH)
                             ) ||
                             (
                                     chat.getCalendarCreated().get(Calendar.YEAR) !=
-                                            chats.get(position - 1).getCalendarCreated().get(Calendar.YEAR)
+                                            chats.get(position + 1).getCalendarCreated().get(Calendar.YEAR)
                             )
             ) {
                 binding.textViewDate.setVisibility(View.VISIBLE);

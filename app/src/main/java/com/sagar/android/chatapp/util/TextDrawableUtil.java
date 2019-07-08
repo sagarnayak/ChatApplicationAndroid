@@ -37,7 +37,7 @@ public class TextDrawableUtil {
                         .buildRound(
                                 String.valueOf(
                                         stringToShow.toCharArray()[0]
-                                ),
+                                ).toUpperCase(),
                                 ColorGenerator.MATERIAL.getColor(
                                         stringToShow
                                 )
@@ -47,7 +47,7 @@ public class TextDrawableUtil {
                         .buildRect(
                                 String.valueOf(
                                         stringToShow.toCharArray()[0]
-                                ),
+                                ).toUpperCase(),
                                 ColorGenerator.MATERIAL.getColor(
                                         stringToShow
                                 )
@@ -56,9 +56,9 @@ public class TextDrawableUtil {
         return null;
     }
 
-    public static Bitmap drawableToBitmap (Drawable drawable) {
+    public static Bitmap drawableToBitmap(Drawable drawable) {
         if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable)drawable).getBitmap();
+            return ((BitmapDrawable) drawable).getBitmap();
         }
 
 

@@ -1,11 +1,18 @@
 package com.sagar.android.chatapp.ui.login;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -53,11 +60,48 @@ public class Login extends AppCompatActivity {
         bindToViewModel();
 
         if (BuildConfig.DEBUG) {
-            binding.contentLogin.editTextUserName.setText("snkumar.nddayak@gmail.com");
-            binding.contentLogin.editTextPassword.setText("sagar nayak");
+            binding.contentLogin.editTextUserName.setText("one@gmail.com");
+            binding.contentLogin.editTextPassword.setText("qwerty");
         }
-        binding.contentLogin.editTextUserName.setText("snkumar.nddayak@gmail.com");
-        binding.contentLogin.editTextPassword.setText("sagar nayak");
+
+        Intent intent = new Intent(this, SignUp.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "chat_app_channel";
+            String description = "chat_app_channel_description";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("chat_app_chan_id", name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+
+            Notification notification = new Notification.Builder(
+                    this,
+                    "chat_app_chan_id"
+            ).setSmallIcon(R.drawable.bubble)
+                    .setContentTitle("title")
+                    .setContentText("content")
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true).build();
+
+            notificationManager.notify(123, notification);
+        } else {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "")
+                    .setSmallIcon(R.drawable.bubble)
+                    .setContentTitle("title")
+                    .setContentText("content")
+                    .setContentIntent(pendingIntent)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setAutoCancel(true);
+
+            NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+            notificationManager.notify(123, builder.build());
+        }
     }
 
     public void onClickLogin(View view) {

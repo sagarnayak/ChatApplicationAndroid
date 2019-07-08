@@ -59,6 +59,11 @@ public class SignUp extends AppCompatActivity {
                 .get(SignUpViewModel.class);
 
         bindToViewModel();
+
+        binding.contentSignUp.editTextUserName.setText("one");
+        binding.contentSignUp.editTextUserEmail.setText("one@gmail.com");
+        binding.contentSignUp.editTextAge.setText("23");
+        binding.contentSignUp.editTextPassword.setText("qwerty");
     }
 
     @Override

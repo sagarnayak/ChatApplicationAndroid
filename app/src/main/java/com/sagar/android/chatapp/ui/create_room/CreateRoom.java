@@ -274,7 +274,7 @@ public class CreateRoom extends AppCompatActivity {
                         charSequence -> charSequence.length() != 0
                 )*/
                 .debounce(
-                        1000, TimeUnit.MILLISECONDS
+                        500, TimeUnit.MILLISECONDS
                 )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

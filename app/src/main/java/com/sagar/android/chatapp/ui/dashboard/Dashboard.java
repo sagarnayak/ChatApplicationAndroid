@@ -140,6 +140,8 @@ public class Dashboard extends AppCompatActivity {
         getRoomList();
 
         prepareSearchResultList();
+
+        setUpSwipeRefresh();
     }
 
     @Override
@@ -478,7 +480,7 @@ public class Dashboard extends AppCompatActivity {
                         charSequence -> charSequence.length() != 0
                 )*/
                 .debounce(
-                        1000, TimeUnit.MILLISECONDS
+                        500, TimeUnit.MILLISECONDS
                 )
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -562,6 +564,7 @@ public class Dashboard extends AppCompatActivity {
         roomListAdapter = new RoomListAdapter(
                 allRoomsList,
                 this,
+                picassoAuthenticated,
                 this::gotoChat
         );
         binding.contentDashboard.recyclerViewRoomList.setLayoutManager(
@@ -591,6 +594,10 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void processAllRooms(ArrayList<Room> rooms) {
+        if (
+                binding.contentDashboard.swipeToRefresh.isRefreshing()
+        )
+            binding.contentDashboard.swipeToRefresh.setRefreshing(false);
         allRoomsList.addAll(rooms);
         roomListAdapter.notifyDataSetChanged();
     }
@@ -610,6 +617,7 @@ public class Dashboard extends AppCompatActivity {
         roomSearchListAdapter = new RoomSearchListAdapter(
                 roomSearchList,
                 this,
+                picassoAuthenticated,
                 this::gotoChat
         );
         binding.contentDashboard.recyclerViewSearchResult.setLayoutManager(
@@ -720,5 +728,14 @@ public class Dashboard extends AppCompatActivity {
                         )
         );
         finish();
+    }
+
+    private void setUpSwipeRefresh() {
+        binding.contentDashboard.swipeToRefresh.setOnRefreshListener(
+                () -> {
+                    setUpRoomList();
+                    getRoomList();
+                }
+        );
     }
 }
