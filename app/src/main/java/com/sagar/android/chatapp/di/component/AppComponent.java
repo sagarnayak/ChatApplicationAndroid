@@ -17,6 +17,7 @@ import com.sagar.android.chatapp.di.builder.SignUpActivityBuilder;
 import com.sagar.android.chatapp.di.module.AppModule;
 import com.sagar.android.chatapp.di.module.LogUtilModule;
 import com.sagar.android.chatapp.di.module.NetworkModule;
+import com.sagar.android.chatapp.di.module.PicassoModule;
 import com.sagar.android.chatapp.di.module.RepositoryModule;
 import com.sagar.android.chatapp.di.module.SharedPreferenceModule;
 import com.sagar.android.chatapp.di.scope.ApplicationScope;
@@ -34,6 +35,7 @@ import dagger.android.AndroidInjectionModule;
                 NetworkModule.class,
                 RepositoryModule.class,
                 SharedPreferenceModule.class,
+                PicassoModule.class,
                 LauncherActivityBuilder.class,
                 SignUpActivityBuilder.class,
                 LoginActivityBuilder.class,
