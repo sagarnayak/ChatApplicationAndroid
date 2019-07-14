@@ -9,4 +9,8 @@ public class KeyWordsAndConstants {
     public static final int ROOM_SEARCH_LIST_PAGE_SIZE = 2;
     public static final int USER_SEARCH_LIST_PAGE_SIZE = 10;
     public static final int CHAT_LIST_PAGE_SIZE = 10;
+    public static final String AVATAR_UPDATED_BROADCAST_ACTION = "avatarChanged";
+    public static final String AVATAR_UPDATED_FOR_USER_BROADCAST_ACTION = "avatarChangedForUser";
+    public static final String CHAT_NOTIFICATIONS = "CHAT_NOTIFICATIONS";
+    public static final String KEY_TEXT_REPLY = "key_text_reply";
 }

@@ -21,6 +21,7 @@ import com.sagar.android.chatapp.ui.login.Login;
 import com.sagar.android.chatapp.util.DialogUtil;
 import com.sagar.android.chatapp.util.ProgressUtil;
 import com.sagar.android.chatapp.util.UiUtil;
+import com.sagar.android.logutilmaster.LogUtil;
 
 import javax.inject.Inject;
 
@@ -32,6 +33,8 @@ public class SignUp extends AppCompatActivity {
     public SignUpViewModelProvider viewModelProvider;
     @Inject
     public ProgressUtil progressUtil;
+    @Inject
+    public LogUtil logUtil;
 
     private SignUpViewModel viewModel;
     private ActivitySignUpBinding binding;

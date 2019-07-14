@@ -17,13 +17,18 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <service
+            android:name=".service.MessageSenderService"
+            android:exported="false"></service>
+
         <activity
             android:name=".ui.create_room.CreateRoom"
             android:label="@string/title_activity_create_room"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.room.ChatRoom"
             android:label="@string/title_activity_chat_room"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.settings.Settings"
@@ -48,6 +53,7 @@
         <activity
             android:name=".ui.dashboard.Dashboard"
             android:label="@string/title_activity_dashboard"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.sign_up.SignUp"

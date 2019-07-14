@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -35,6 +36,7 @@ import com.sagar.android.chatapp.model.searchUserResuest;
 import com.sagar.android.chatapp.repository.retrofit.ApiInterface;
 import com.sagar.android.chatapp.ui.launcher.Launcher;
 import com.sagar.android.logutilmaster.LogUtil;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +45,7 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.logging.Handler;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -77,6 +80,7 @@ public class Repository {
     public MutableLiveData<Result> mutableLiveDataJoinRoomError;
     public MutableLiveData<Result> mutableLiveDataConnectedToSocket;
     public MutableLiveData<ArrayList<Chat>> mutableLiveDataChats;
+    public MutableLiveData<Room> mutableLiveDataRoom;
 
     private ArrayList<Disposable> searchRoomDisposablesList;
 
@@ -109,6 +113,7 @@ public class Repository {
         mutableLiveDataJoinRoomError = new MutableLiveData<>();
         mutableLiveDataConnectedToSocket = new MutableLiveData<>();
         mutableLiveDataChats = new MutableLiveData<>();
+        mutableLiveDataRoom = new MutableLiveData<>();
 
         searchRoomDisposablesList = new ArrayList<>();
     }
@@ -1442,6 +1447,62 @@ public class Repository {
                         }
                 );
     }
+
+    public void getRoom(String roomId) {
+        apiInterface.getRoom(
+                getAuthToken(),
+                roomId
+        )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+                                if (responseBodyResponse.code() == 404)
+                                    notAuthorised();
+                                else if (responseBodyResponse.code() == 200) {
+                                    try {
+                                        mutableLiveDataRoom.postValue(
+                                                new Gson().fromJson(
+                                                        responseBodyResponse.body().string(),
+                                                        Room.class
+                                                )
+                                        );
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                new Thread(
+                                        () -> {
+                                            try {
+                                                Thread.sleep(1000);
+                                            } catch (InterruptedException e1) {
+                                                e1.printStackTrace();
+                                            }
+                                            mutableLiveDataRoom.postValue(null);
+                                        }
+                                ).start();
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1645,6 +1706,88 @@ public class Repository {
                             public void call(Object... args) {
                                 logUtil.logV("got new messages : " + Arrays.toString(args));
                                 gotNewChats(args);
+                            }
+                        }
+                );
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        try {
+            if (socket.connected())
+                return;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            socket.connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logUtil.logV("socket connection failed : " + e.toString());
+        }
+    }
+
+    public void sendMessageToServer(
+            String roomId,
+            String message
+    ){
+        try {
+            if (socket == null) {
+                IO.Options options = new IO.Options();
+                options.forceNew = true;
+                options.query = "token=" + getAuthToken();
+                socket = IO.socket(URLs.BASE_URL, options);
+
+                socket.on(
+                        SocketEvent.CONNECT,
+                        new Emitter.Listener() {
+                            @Override
+                            public void call(Object... args) {
+                                logUtil.logV("socket connected");
+                            }
+                        }
+                );
+
+                socket.on(
+                        SocketEvent.DISCONNECT,
+                        new Emitter.Listener() {
+                            @Override
+                            public void call(Object... args) {
+                                logUtil.logV("socket disconnected");
+                            }
+                        }
+                );
+
+                socket.on(
+                        SocketEvent.YOU_ARE_CONNECTED,
+                        new Emitter.Listener() {
+                            @Override
+                            public void call(Object... objects) {
+                                socket.emit(
+                                        SocketEvent.SEND_NEW_MESSAGE,
+                                        new Gson().toJson(
+                                                new NewMessageReq(
+                                                        message,
+                                                        roomId
+                                                )
+                                        )
+                                );
+
+                                new Thread(
+                                        new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                try {
+                                                    Thread.sleep(3000);
+                                                } catch (InterruptedException e) {
+                                                    e.printStackTrace();
+                                                }
+
+                                                disconnectSocket();
+                                            }
+                                        }
+                                ).start();
                             }
                         }
                 );

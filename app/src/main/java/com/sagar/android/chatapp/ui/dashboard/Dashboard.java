@@ -83,10 +83,21 @@ public class Dashboard extends AppCompatActivity {
     private DashboardViewModel viewModel;
     private ActivityDashboardBinding binding;
 
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
+    private BroadcastReceiver receiverAvatarUpdated = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             viewModel.shouldClearCacheForAvatar();
+        }
+    };
+
+    private BroadcastReceiver receiverAvatarUpdatedForUser = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            clearCacheForUserPicture(
+                    intent.getStringExtra(
+                            "userId"
+                    )
+            );
         }
     };
 
@@ -127,10 +138,20 @@ public class Dashboard extends AppCompatActivity {
 
         setUpUI();
 
-        IntentFilter intentFilter = new IntentFilter("AvatarUpdated");
+        IntentFilter intentFilter = new IntentFilter(
+                KeyWordsAndConstants.AVATAR_UPDATED_BROADCAST_ACTION
+        );
         registerReceiver(
-                receiver,
+                receiverAvatarUpdated,
                 intentFilter
+        );
+
+        IntentFilter intentFilterAvatarUpdatedForUser = new IntentFilter(
+                KeyWordsAndConstants.AVATAR_UPDATED_FOR_USER_BROADCAST_ACTION
+        );
+        registerReceiver(
+                receiverAvatarUpdatedForUser,
+                intentFilterAvatarUpdatedForUser
         );
 
         setUpSearchToolBar();
@@ -737,5 +758,15 @@ public class Dashboard extends AppCompatActivity {
                     getRoomList();
                 }
         );
+    }
+
+    private void clearCacheForUserPicture(String userId) {
+        logUtil.logV("here" + userId);
+        if (viewModel.getUserData().getUser().getId().equals(userId))
+            return;
+        picassoAuthenticated.invalidate(
+                URLs.PROFILE_PICTURE_URL + userId
+        );
+        roomSearchListAdapter.notifyDataSetChanged();
     }
 }

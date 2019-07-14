@@ -10,6 +10,7 @@ import com.sagar.android.chatapp.di.builder.FirebaseMessagingServiceBuilder;
 import com.sagar.android.chatapp.di.builder.ForgotPasswordActivityBuilder;
 import com.sagar.android.chatapp.di.builder.LauncherActivityBuilder;
 import com.sagar.android.chatapp.di.builder.LoginActivityBuilder;
+import com.sagar.android.chatapp.di.builder.MessageSenderServiceBuilder;
 import com.sagar.android.chatapp.di.builder.ProfileActivityBuilder;
 import com.sagar.android.chatapp.di.builder.ResetPasswordWithOtpActivityBuilder;
 import com.sagar.android.chatapp.di.builder.SettingsActivityBuilder;
@@ -17,6 +18,7 @@ import com.sagar.android.chatapp.di.builder.SignUpActivityBuilder;
 import com.sagar.android.chatapp.di.module.AppModule;
 import com.sagar.android.chatapp.di.module.LogUtilModule;
 import com.sagar.android.chatapp.di.module.NetworkModule;
+import com.sagar.android.chatapp.di.module.NotificationMasterModule;
 import com.sagar.android.chatapp.di.module.PicassoModule;
 import com.sagar.android.chatapp.di.module.RepositoryModule;
 import com.sagar.android.chatapp.di.module.SharedPreferenceModule;
@@ -36,6 +38,7 @@ import dagger.android.AndroidInjectionModule;
                 RepositoryModule.class,
                 SharedPreferenceModule.class,
                 PicassoModule.class,
+                NotificationMasterModule.class,
                 LauncherActivityBuilder.class,
                 SignUpActivityBuilder.class,
                 LoginActivityBuilder.class,
@@ -46,7 +49,8 @@ import dagger.android.AndroidInjectionModule;
                 FirebaseMessagingServiceBuilder.class,
                 SettingsActivityBuilder.class,
                 CreateRoomActivityBuilder.class,
-                ChatRoomActivityBuilder.class
+                ChatRoomActivityBuilder.class,
+                MessageSenderServiceBuilder.class
         }
 )
 public interface AppComponent {

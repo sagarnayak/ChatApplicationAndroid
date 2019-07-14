@@ -82,7 +82,8 @@ public class RoomSearchListAdapter extends RecyclerView.Adapter<RoomSearchListAd
             binding.recyclerViewUsers.setAdapter(
                     new UserHorizontalListAdapter(
                             room.getUsers(),
-                            picasso
+                            picasso,
+                            context
                     )
             );
             binding.container.setOnClickListener(

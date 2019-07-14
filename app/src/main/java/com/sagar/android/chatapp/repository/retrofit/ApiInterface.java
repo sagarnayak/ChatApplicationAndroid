@@ -108,4 +108,10 @@ public interface ApiInterface {
             @Header("Authorization") String authHeader,
             @Body JoinRoomRequest joinRoomRequest
     );
+
+    @GET("getRoom/{roomId}")
+    Observable<Response<ResponseBody>> getRoom(
+            @Header("Authorization") String authHeader,
+            @Path("roomId") String roomId
+    );
 }

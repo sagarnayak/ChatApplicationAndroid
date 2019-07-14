@@ -25,6 +25,7 @@ import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.Room;
 import com.sagar.android.chatapp.model.User;
 import com.sagar.android.chatapp.model.UserData;
+import com.sagar.android.chatapp.notification.NotificationMaster;
 import com.sagar.android.chatapp.ui.dashboard.Dashboard;
 import com.sagar.android.chatapp.ui.room.adapter.ChatRoomAdapter;
 import com.sagar.android.chatapp.util.DialogUtil;
@@ -51,6 +52,8 @@ public class ChatRoom extends AppCompatActivity {
     public Picasso picasso;
     @Inject
     public LogUtil logUtil;
+    @Inject
+    public NotificationMaster notificationMaster;
 
     private Room room;
     private ActivityChatRoomBinding binding;
@@ -83,8 +86,6 @@ public class ChatRoom extends AppCompatActivity {
 
         prepareChatList();
 
-        setUpUI();
-
         bindToViewModel();
     }
 
@@ -106,7 +107,19 @@ public class ChatRoom extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        viewModel.initialiseSockets();
+        tryInitializingSocketAfterDelay();
+    }
+
+    private void tryInitializingSocketAfterDelay() {
+        new Handler().postDelayed(
+                () -> {
+                    if (room != null)
+                        viewModel.initialiseSockets();
+                    else
+                        tryInitializingSocketAfterDelay();
+                },
+                500
+        );
     }
 
     @Override
@@ -177,13 +190,36 @@ public class ChatRoom extends AppCompatActivity {
                                 gotNewChats(chats);
                         }
                 );
+
+        viewModel.mediatorLiveDataRoom
+                .observe(
+                        this,
+                        room -> {
+                            if (room != null)
+                                processRoomData(room);
+                        }
+                );
     }
 
     private void getDataFromIntent() {
-        room = new Gson().fromJson(
-                getIntent().getStringExtra(DATA),
-                Room.class
-        );
+        userData = viewModel.getUserData();
+
+        try {
+            room = new Gson().fromJson(
+                    getIntent().getStringExtra(DATA),
+                    Room.class
+            );
+
+            setUpUI();
+
+            notificationMaster.readAllChatsInRoom(room.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            getRoomData(
+                    getIntent().getStringExtra("roomId")
+            );
+        }
     }
 
     private void setUpUI() {
@@ -324,7 +360,8 @@ public class ChatRoom extends AppCompatActivity {
         adapter = new ChatRoomAdapter(
                 chats,
                 picasso,
-                userData
+                userData,
+                this
         );
 
         binding.contentChatRoom.recyclerViewChats.setLayoutManager(
@@ -448,5 +485,17 @@ public class ChatRoom extends AppCompatActivity {
                     500
             );
         }
+    }
+
+    private void getRoomData(String roomId) {
+        viewModel.getRoom(roomId);
+    }
+
+    private void processRoomData(Room room) {
+        this.room = room;
+
+        setUpUI();
+
+        notificationMaster.readAllChatsInRoom(room.getId());
     }
 }

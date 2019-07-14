@@ -19,6 +19,7 @@ public class ChatRoomViewModel extends ViewModel {
     public MediatorLiveData<Result> mediatorLiveDataJoinRoomError;
     public MediatorLiveData<Result> mediatorLiveDataConnectedToSocket;
     public MediatorLiveData<ArrayList<Chat>> mediatorLiveDataChats;
+    public MediatorLiveData<Room> mediatorLiveDataRoom;
 
     public ChatRoomViewModel(Repository repository) {
         this.repository = repository;
@@ -28,6 +29,7 @@ public class ChatRoomViewModel extends ViewModel {
         mediatorLiveDataJoinRoomError = new MediatorLiveData<>();
         mediatorLiveDataConnectedToSocket = new MediatorLiveData<>();
         mediatorLiveDataChats = new MediatorLiveData<>();
+        mediatorLiveDataRoom = new MediatorLiveData<>();
 
         bindToRepo();
     }
@@ -56,6 +58,11 @@ public class ChatRoomViewModel extends ViewModel {
         mediatorLiveDataChats.addSource(
                 repository.mutableLiveDataChats,
                 chats -> mediatorLiveDataChats.postValue(chats)
+        );
+
+        mediatorLiveDataRoom.addSource(
+                repository.mutableLiveDataRoom,
+                room -> mediatorLiveDataRoom.postValue(room)
         );
     }
 
@@ -101,5 +108,9 @@ public class ChatRoomViewModel extends ViewModel {
 
     public void joinRoomSocket(String roomId) {
         repository.joinRoomSocket(roomId);
+    }
+
+    public void getRoom(String roomId) {
+        repository.getRoom(roomId);
     }
 }
