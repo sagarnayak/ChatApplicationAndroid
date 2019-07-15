@@ -149,7 +149,7 @@ public class NotificationMaster {
         }
     }
 
-    public void readAllChatsInRoom(String roomId) {
+    public void readAllChatsInRoom(String roomId, boolean shouldPropagateToSerer) {
         ArrayList<RoomMinified> roomMinifieds = getAllChatNotifications();
 
         int index = -1;
@@ -168,12 +168,21 @@ public class NotificationMaster {
 
             notificationManager.cancel(index + 1);
         }
+
+        if (shouldPropagateToSerer)
+            repository.readAllNotificationForRoom(roomId);
     }
 
     private void postNewOrUpdateNotification(RoomMinified roomMinified, int index) {
         Intent intent = new Intent(context, ChatRoom.class);
         intent.putExtra("roomId", roomMinified.getRoomId());
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        PendingIntent pendingIntent =
+                PendingIntent.getActivity(
+                        context,
+                        123,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
 
         createNotificationChannel();
 

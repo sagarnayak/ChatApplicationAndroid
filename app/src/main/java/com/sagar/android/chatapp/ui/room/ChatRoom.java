@@ -1,6 +1,9 @@
 package com.sagar.android.chatapp.ui.room;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -19,6 +22,7 @@ import com.google.gson.Gson;
 import com.sagar.android.chatapp.R;
 import com.sagar.android.chatapp.core.Enums;
 import com.sagar.android.chatapp.core.KeyWordsAndConstants;
+import com.sagar.android.chatapp.core.URLs;
 import com.sagar.android.chatapp.databinding.ActivityChatRoomBinding;
 import com.sagar.android.chatapp.model.Chat;
 import com.sagar.android.chatapp.model.Result;
@@ -35,6 +39,7 @@ import com.sagar.android.logutilmaster.LogUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import javax.inject.Inject;
 
@@ -59,6 +64,17 @@ public class ChatRoom extends AppCompatActivity {
     private ActivityChatRoomBinding binding;
     private ChatRoomViewModel viewModel;
     private MenuItem menuItemLeave;
+
+    private BroadcastReceiver receiverAvatarUpdatedForUser = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            clearCacheForUserPicture(
+                    intent.getStringExtra(
+                            "userId"
+                    )
+            );
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +103,14 @@ public class ChatRoom extends AppCompatActivity {
         prepareChatList();
 
         bindToViewModel();
+
+        IntentFilter intentFilterAvatarUpdatedForUser = new IntentFilter(
+                KeyWordsAndConstants.AVATAR_UPDATED_FOR_USER_BROADCAST_ACTION
+        );
+        registerReceiver(
+                receiverAvatarUpdatedForUser,
+                intentFilterAvatarUpdatedForUser
+        );
     }
 
     @Override
@@ -101,6 +125,8 @@ public class ChatRoom extends AppCompatActivity {
         super.onPause();
 
         viewModel.disconnectSocket();
+
+        finish();
     }
 
     @Override
@@ -212,12 +238,13 @@ public class ChatRoom extends AppCompatActivity {
 
             setUpUI();
 
-            notificationMaster.readAllChatsInRoom(room.getId());
+            notificationMaster.readAllChatsInRoom(room.getId(), true);
         } catch (Exception e) {
             e.printStackTrace();
 
+            String data = getIntent().getStringExtra("roomId");
             getRoomData(
-                    getIntent().getStringExtra("roomId")
+                    data
             );
         }
     }
@@ -360,8 +387,7 @@ public class ChatRoom extends AppCompatActivity {
         adapter = new ChatRoomAdapter(
                 chats,
                 picasso,
-                userData,
-                this
+                userData
         );
 
         binding.contentChatRoom.recyclerViewChats.setLayoutManager(
@@ -496,6 +522,21 @@ public class ChatRoom extends AppCompatActivity {
 
         setUpUI();
 
-        notificationMaster.readAllChatsInRoom(room.getId());
+        notificationMaster.readAllChatsInRoom(room.getId(), true);
+    }
+
+    private void clearCacheForUserPicture(String userId) {
+        picasso.invalidate(
+                URLs.PROFILE_PICTURE_URL + userId
+        );
+        for (Chat chat :
+                chats) {
+            if (chat.getAuthorDetail().getId().equalsIgnoreCase(userId)) {
+                chat.getAuthorDetail().setAvatarLastUpdated(
+                        Calendar.getInstance()
+                );
+            }
+        }
+        adapter.notifyDataSetChanged();
     }
 }

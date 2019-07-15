@@ -42,6 +42,7 @@ import com.sagar.android.chatapp.core.URLs;
 import com.sagar.android.chatapp.databinding.ActivityDashboardBinding;
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.Room;
+import com.sagar.android.chatapp.model.User;
 import com.sagar.android.chatapp.ui.create_room.CreateRoom;
 import com.sagar.android.chatapp.ui.dashboard.adapter.RoomListAdapter;
 import com.sagar.android.chatapp.ui.dashboard.adapter.RoomSearchListAdapter;
@@ -59,6 +60,7 @@ import com.squareup.picasso.Picasso;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -761,12 +763,36 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void clearCacheForUserPicture(String userId) {
-        logUtil.logV("here" + userId);
-        if (viewModel.getUserData().getUser().getId().equals(userId))
-            return;
         picassoAuthenticated.invalidate(
                 URLs.PROFILE_PICTURE_URL + userId
         );
+        for (Room room :
+                allRoomsList) {
+            for (User user :
+                    room.getUsers()) {
+                if (
+                        user.getId().equalsIgnoreCase(userId)
+                ) {
+                    user.setAvatarLastUpdated(
+                            Calendar.getInstance()
+                    );
+                }
+            }
+        }
+        for (Room room :
+                roomSearchList) {
+            for (User user :
+                    room.getUsers()) {
+                if (
+                        user.getId().equalsIgnoreCase(userId)
+                ) {
+                    user.setAvatarLastUpdated(
+                            Calendar.getInstance()
+                    );
+                }
+            }
+        }
+        roomListAdapter.notifyDataSetChanged();
         roomSearchListAdapter.notifyDataSetChanged();
     }
 }

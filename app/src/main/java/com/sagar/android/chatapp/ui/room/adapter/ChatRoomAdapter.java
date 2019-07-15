@@ -1,9 +1,6 @@
 package com.sagar.android.chatapp.ui.room.adapter;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +14,8 @@ import com.sagar.android.chatapp.databinding.ChatBubbleRightBinding;
 import com.sagar.android.chatapp.model.Chat;
 import com.sagar.android.chatapp.model.UserData;
 import com.sagar.android.chatapp.util.CircleTransformation;
-import com.sagar.android.chatapp.util.PicassoForUserAvatar;
 import com.sagar.android.chatapp.util.TextDrawableUtil;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,16 +24,14 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private ArrayList<Chat> chats;
     private Picasso picasso;
     private UserData userData;
-    private Context context;
 
     private static final int MY_MSG = 1;
     private static final int OTHERS_MSG = 2;
 
-    public ChatRoomAdapter(ArrayList<Chat> chats, Picasso picasso, UserData userData, Context context) {
+    public ChatRoomAdapter(ArrayList<Chat> chats, Picasso picasso, UserData userData) {
         this.chats = chats;
         this.picasso = picasso;
         this.userData = userData;
-        this.context = context;
     }
 
     @Override
@@ -101,51 +94,23 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ) {
                 binding.appcompatImageViewUserImage.setVisibility(View.VISIBLE);
                 binding.textViewUserName.setVisibility(View.VISIBLE);
-                new PicassoForUserAvatar(
-                        context,
-                        picasso,
-                        new CircleTransformation(),
-                        binding.appcompatImageViewUserImage,
-                        chat.getAuthorDetail().getId(),
-                        chat.getAuthorDetail().getName(),
-                        () -> {
-                            picasso.invalidate(
-                                    URLs.PROFILE_PICTURE_URL + chat.getAuthorDetail().getId()
-                            );
-                            //noinspection ConstantConditions
-                            picasso
-                                    .load(
-                                            URLs.PROFILE_PICTURE_URL + chat.getAuthorDetail().getId()
-                                    )
-                                    .transform(
-                                            new CircleTransformation()
-                                    )
-                                    .placeholder(
-                                            TextDrawableUtil.getPlaceHolder(
-                                                    chat.getAuthorDetail().getName(),
-                                                    TextDrawableUtil.Shape.ROUND
-                                            )
-                                    )
-                                    .into(
-                                            new Target() {
-                                                @Override
-                                                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                                    binding.appcompatImageViewUserImage.setImageBitmap(bitmap);
-                                                }
-
-                                                @Override
-                                                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
-                                                }
-
-                                                @Override
-                                                public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                                                }
-                                            }
-                                    );
-                        }
-                );
+                //noinspection ConstantConditions
+                picasso
+                        .load(
+                                URLs.PROFILE_PICTURE_URL + chat.getAuthorDetail().getId()
+                        )
+                        .transform(
+                                new CircleTransformation()
+                        )
+                        .placeholder(
+                                TextDrawableUtil.getPlaceHolder(
+                                        chat.getAuthorDetail().getName(),
+                                        TextDrawableUtil.Shape.ROUND
+                                )
+                        )
+                        .into(
+                                binding.appcompatImageViewUserImage
+                        );
                 binding.textViewUserName.setText(
                         chat.getAuthorDetail().getName()
                 );
@@ -203,51 +168,23 @@ public class ChatRoomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             ) {
                 binding.appcompatImageViewUserImage.setVisibility(View.VISIBLE);
                 binding.textViewUserName.setVisibility(View.VISIBLE);
-                new PicassoForUserAvatar(
-                        context,
-                        picasso,
-                        new CircleTransformation(),
-                        binding.appcompatImageViewUserImage,
-                        chat.getAuthorDetail().getId(),
-                        chat.getAuthorDetail().getName(),
-                        () -> {
-                            picasso.invalidate(
-                                    URLs.PROFILE_PICTURE_URL + chat.getAuthorDetail().getId()
-                            );
-                            //noinspection ConstantConditions
-                            picasso
-                                    .load(
-                                            URLs.PROFILE_PICTURE_URL + chat.getAuthorDetail().getId()
-                                    )
-                                    .transform(
-                                            new CircleTransformation()
-                                    )
-                                    .placeholder(
-                                            TextDrawableUtil.getPlaceHolder(
-                                                    chat.getAuthorDetail().getName(),
-                                                    TextDrawableUtil.Shape.ROUND
-                                            )
-                                    )
-                                    .into(
-                                            new Target() {
-                                                @Override
-                                                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                                    binding.appcompatImageViewUserImage.setImageBitmap(bitmap);
-                                                }
-
-                                                @Override
-                                                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
-                                                }
-
-                                                @Override
-                                                public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                                                }
-                                            }
-                                    );
-                        }
-                );
+                //noinspection ConstantConditions
+                picasso
+                        .load(
+                                URLs.PROFILE_PICTURE_URL + chat.getAuthorDetail().getId()
+                        )
+                        .transform(
+                                new CircleTransformation()
+                        )
+                        .placeholder(
+                                TextDrawableUtil.getPlaceHolder(
+                                        chat.getAuthorDetail().getName(),
+                                        TextDrawableUtil.Shape.ROUND
+                                )
+                        )
+                        .into(
+                                binding.appcompatImageViewUserImage
+                        );
                 binding.textViewUserName.setText(
                         chat.getAuthorDetail().getName()
                 );

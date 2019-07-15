@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import javax.inject.Inject;
 
 import dagger.android.AndroidInjection;
+import io.reactivex.annotations.NonNull;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -165,7 +166,16 @@ public class Profile extends AppCompatActivity {
     }
 
     public void onClickEditPicture(View view) {
-        changeDp();
+       ProfilePermissionsDispatcher.changeDpWithPermissionCheck(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // NOTE: delegate the permission handling to generated method
+        ProfilePermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
     @NeedsPermission(

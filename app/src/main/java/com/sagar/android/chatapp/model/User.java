@@ -2,6 +2,8 @@ package com.sagar.android.chatapp.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Calendar;
+
 public class User {
     @SerializedName("age")
     private int age;
@@ -11,6 +13,7 @@ public class User {
     private String name;
     @SerializedName("_id")
     private String Id;
+    private Calendar avatarLastUpdated = Calendar.getInstance();
 
     public User() {
     }
@@ -52,5 +55,13 @@ public class User {
 
     public void setId(String Id) {
         this.Id = Id;
+    }
+
+    public Calendar getAvatarLastUpdated() {
+        return avatarLastUpdated;
+    }
+
+    public void setAvatarLastUpdated(Calendar avatarLastUpdated) {
+        this.avatarLastUpdated = avatarLastUpdated;
     }
 }

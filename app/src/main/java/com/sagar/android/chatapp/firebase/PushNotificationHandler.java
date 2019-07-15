@@ -23,8 +23,6 @@ public class PushNotificationHandler extends FirebaseMessagingService {
     @Inject
     Repository repository;
     @Inject
-    Picasso picasso;
-    @Inject
     NotificationMaster notificationMaster;
 
     @Override
@@ -69,6 +67,12 @@ public class PushNotificationHandler extends FirebaseMessagingService {
                                     remoteMessage.getData().get("createdAt")
                             )
                     );
+                    break;
+                case "messageReadForRoom":
+                    allMessageReadForRoom(
+                            remoteMessage.getData().get("roomId")
+                    );
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,9 +91,6 @@ public class PushNotificationHandler extends FirebaseMessagingService {
     }
 
     private void avatarUpdatedForUser(String userId) {
-        picasso.invalidate(
-                URLs.PROFILE_PICTURE_URL + userId
-        );
         Intent intent = new Intent();
         intent.putExtra(
                 "userId",
@@ -107,5 +108,9 @@ public class PushNotificationHandler extends FirebaseMessagingService {
         if (!repository.isLoggedIn())
             return;
         notificationMaster.gotNewChat(chatNotification);
+    }
+
+    private void allMessageReadForRoom(String roomId) {
+        notificationMaster.readAllChatsInRoom(roomId,false);
     }
 }

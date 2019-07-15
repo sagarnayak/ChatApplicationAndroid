@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.github.nkzawa.emitter.Emitter;
@@ -25,6 +24,7 @@ import com.sagar.android.chatapp.model.GetChatsRequest;
 import com.sagar.android.chatapp.model.JoinRoomRequest;
 import com.sagar.android.chatapp.model.LoginRequest;
 import com.sagar.android.chatapp.model.NewMessageReq;
+import com.sagar.android.chatapp.model.ReadAllNotificationForRoomReq;
 import com.sagar.android.chatapp.model.ResetPasswordRequest;
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.Room;
@@ -36,7 +36,6 @@ import com.sagar.android.chatapp.model.searchUserResuest;
 import com.sagar.android.chatapp.repository.retrofit.ApiInterface;
 import com.sagar.android.chatapp.ui.launcher.Launcher;
 import com.sagar.android.logutilmaster.LogUtil;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,7 +44,6 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Handler;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -1503,6 +1501,39 @@ public class Repository {
                         }
                 );
     }
+
+    public void readAllNotificationForRoom(String roomId) {
+        apiInterface
+                .readAllNotificationForRoom(
+                        getAuthToken(),
+                        new ReadAllNotificationForRoomReq(roomId)
+                )
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Observer<Response<ResponseBody>>() {
+                            @Override
+                            public void onSubscribe(Disposable disposable) {
+
+                            }
+
+                            @Override
+                            public void onNext(Response<ResponseBody> responseBodyResponse) {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable throwable) {
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        }
+                );
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1731,7 +1762,7 @@ public class Repository {
     public void sendMessageToServer(
             String roomId,
             String message
-    ){
+    ) {
         try {
             if (socket == null) {
                 IO.Options options = new IO.Options();
@@ -1765,7 +1796,7 @@ public class Repository {
                             @Override
                             public void call(Object... objects) {
                                 socket.emit(
-                                        SocketEvent.SEND_NEW_MESSAGE,
+                                        SocketEvent.SEND_NEW_MESSAGE_AND_DISCONNECT,
                                         new Gson().toJson(
                                                 new NewMessageReq(
                                                         message,
@@ -1773,21 +1804,6 @@ public class Repository {
                                                 )
                                         )
                                 );
-
-                                new Thread(
-                                        new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                try {
-                                                    Thread.sleep(3000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-
-                                                disconnectSocket();
-                                            }
-                                        }
-                                ).start();
                             }
                         }
                 );

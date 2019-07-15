@@ -80,8 +80,7 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.ViewHo
             binding.recyclerViewUsers.setAdapter(
                     new UserHorizontalListAdapter(
                             room.getUsers(),
-                            picasso,
-                            context
+                            picasso
                     )
             );
             binding.container.setOnClickListener(

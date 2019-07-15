@@ -1,17 +1,17 @@
 package com.sagar.android.chatapp.ui.dashboard.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.sagar.android.chatapp.core.URLs;
 import com.sagar.android.chatapp.databinding.MoreCountForUserHorListBinding;
 import com.sagar.android.chatapp.databinding.UserHorListItemBinding;
 import com.sagar.android.chatapp.model.User;
 import com.sagar.android.chatapp.util.CircleTransformation;
-import com.sagar.android.chatapp.util.PicassoForUserAvatar;
+import com.sagar.android.chatapp.util.TextDrawableUtil;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -24,12 +24,10 @@ public class UserHorizontalListAdapter extends RecyclerView.Adapter<RecyclerView
 
     private ArrayList<User> users;
     private Picasso picasso;
-    private Context context;
 
-    public UserHorizontalListAdapter(ArrayList<User> users, Picasso picasso, Context context) {
+    public UserHorizontalListAdapter(ArrayList<User> users, Picasso picasso) {
         this.users = users;
         this.picasso = picasso;
-        this.context = context;
     }
 
     @NonNull
@@ -98,14 +96,24 @@ public class UserHorizontalListAdapter extends RecyclerView.Adapter<RecyclerView
         }
 
         public void bind(User user) {
-            new PicassoForUserAvatar(
-                    context,
-                    picasso,
-                    new CircleTransformation(),
-                    binding.appcompatImageViewUserImage,
-                    user.getId(),
-                    user.getName()
-            );
+            //noinspection ConstantConditions
+            picasso
+                    .load(
+                            URLs.PROFILE_PICTURE_URL + user.getId()
+                    )
+                    .transform(
+                            new CircleTransformation()
+                    )
+                    .placeholder(
+                            TextDrawableUtil
+                                    .getPlaceHolder(
+                                            user.getName(),
+                                            TextDrawableUtil.Shape.ROUND
+                                    )
+                    )
+                    .into(
+                            binding.appcompatImageViewUserImage
+                    );
         }
     }
 

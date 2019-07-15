@@ -3,6 +3,7 @@ package com.sagar.android.chatapp.repository.retrofit;
 import com.sagar.android.chatapp.model.FcmTokenData;
 import com.sagar.android.chatapp.model.JoinRoomRequest;
 import com.sagar.android.chatapp.model.LoginRequest;
+import com.sagar.android.chatapp.model.ReadAllNotificationForRoomReq;
 import com.sagar.android.chatapp.model.ResetPasswordRequest;
 import com.sagar.android.chatapp.model.UserSignUpRequest;
 import com.sagar.android.chatapp.model.createRoomRequest;
@@ -113,5 +114,11 @@ public interface ApiInterface {
     Observable<Response<ResponseBody>> getRoom(
             @Header("Authorization") String authHeader,
             @Path("roomId") String roomId
+    );
+
+    @POST("readAllNotification")
+    Observable<Response<ResponseBody>> readAllNotificationForRoom(
+            @Header("Authorization") String authHeader,
+            @Body ReadAllNotificationForRoomReq readAllNotificationForRoomReq
     );
 }
