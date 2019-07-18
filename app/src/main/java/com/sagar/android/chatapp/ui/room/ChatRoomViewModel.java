@@ -7,6 +7,7 @@ import com.sagar.android.chatapp.model.Chat;
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.Room;
 import com.sagar.android.chatapp.model.UserData;
+import com.sagar.android.chatapp.repository.Event;
 import com.sagar.android.chatapp.repository.Repository;
 
 import java.util.ArrayList;
@@ -14,12 +15,12 @@ import java.util.ArrayList;
 public class ChatRoomViewModel extends ViewModel {
     private Repository repository;
 
-    public MediatorLiveData<Result> mediatorLiveDataLeaveRoomResult;
-    public MediatorLiveData<Room> mediatorLiveDataJoinRoomResult;
-    public MediatorLiveData<Result> mediatorLiveDataJoinRoomError;
-    public MediatorLiveData<Result> mediatorLiveDataConnectedToSocket;
-    public MediatorLiveData<ArrayList<Chat>> mediatorLiveDataChats;
-    public MediatorLiveData<Room> mediatorLiveDataRoom;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataLeaveRoomResult;
+    public MediatorLiveData<Event<Room>> mediatorLiveDataJoinRoomResult;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataJoinRoomError;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataConnectedToSocket;
+    public MediatorLiveData<Event<ArrayList<Chat>>> mediatorLiveDataChats;
+    public MediatorLiveData<Event<Room>> mediatorLiveDataRoom;
 
     public ChatRoomViewModel(Repository repository) {
         this.repository = repository;

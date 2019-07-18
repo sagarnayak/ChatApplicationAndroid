@@ -277,8 +277,8 @@ public class Dashboard extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processLogoutResult(result);
+                            if (result.shouldReadContent())
+                                processLogoutResult(result.getContent());
                         }
                 );
 
@@ -286,8 +286,8 @@ public class Dashboard extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processShouldClearPicassoCacheForAvatarResult(result);
+                            if (result.shouldReadContent())
+                                processShouldClearPicassoCacheForAvatarResult(result.getContent());
                         }
                 );
 
@@ -295,8 +295,8 @@ public class Dashboard extends AppCompatActivity {
                 .observe(
                         this,
                         rooms -> {
-                            if (rooms != null)
-                                processAllRooms(rooms);
+                            if (rooms.shouldReadContent())
+                                processAllRooms(rooms.getContent());
                         }
                 );
 
@@ -304,8 +304,8 @@ public class Dashboard extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processAllRoomError(result);
+                            if (result.shouldReadContent())
+                                processAllRoomError(result.getContent());
                         }
                 );
 
@@ -313,8 +313,8 @@ public class Dashboard extends AppCompatActivity {
                 .observe(
                         this,
                         rooms -> {
-                            if (rooms != null)
-                                processRoomSearchResult(rooms);
+                            if (rooms.shouldReadContent())
+                                processRoomSearchResult(rooms.getContent());
                         }
                 );
     }

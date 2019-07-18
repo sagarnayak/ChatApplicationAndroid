@@ -166,7 +166,7 @@ public class Profile extends AppCompatActivity {
     }
 
     public void onClickEditPicture(View view) {
-       ProfilePermissionsDispatcher.changeDpWithPermissionCheck(this);
+        ProfilePermissionsDispatcher.changeDpWithPermissionCheck(this);
     }
 
     @Override
@@ -259,8 +259,8 @@ public class Profile extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processUpdateAvatarResult(result);
+                            if (result.shouldReadContent())
+                                processUpdateAvatarResult(result.getContent());
                         }
                 );
 
@@ -268,8 +268,8 @@ public class Profile extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processShouldClearCacheForAvatarResult(result);
+                            if (result.shouldReadContent())
+                                processShouldClearCacheForAvatarResult(result.getContent());
                         }
                 );
     }

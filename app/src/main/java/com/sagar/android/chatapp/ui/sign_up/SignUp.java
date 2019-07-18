@@ -96,8 +96,8 @@ public class SignUp extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processSignUpResult(result);
+                            if (result.shouldReadContent())
+                                processSignUpResult(result.getContent());
                         }
                 );
     }

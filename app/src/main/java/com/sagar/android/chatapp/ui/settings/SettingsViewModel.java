@@ -4,12 +4,13 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.sagar.android.chatapp.model.Result;
+import com.sagar.android.chatapp.repository.Event;
 import com.sagar.android.chatapp.repository.Repository;
 
 public class SettingsViewModel extends ViewModel {
     private Repository repository;
 
-    public MediatorLiveData<Result> mediatorLiveDataLogoutAllResult;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataLogoutAllResult;
 
     public SettingsViewModel(Repository repository) {
         this.repository = repository;

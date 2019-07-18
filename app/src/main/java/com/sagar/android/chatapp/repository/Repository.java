@@ -60,25 +60,25 @@ public class Repository {
     private Application application;
     private LogUtil logUtil;
 
-    public MutableLiveData<Result> mutableLiveDataSignUpResult;
-    public MutableLiveData<Result> mutableLiveDataLoginResult;
-    public MutableLiveData<Result> mutableLiveDataForgotPasswordResult;
-    public MutableLiveData<Result> mutableLiveDataResetPasswordResult;
-    public MutableLiveData<Result> mutableLiveDataLogoutResult;
-    public MutableLiveData<Result> mutableLiveDataUpdateAvatarResult;
-    public MutableLiveData<Result> mutableLiveDataShouldClearPicassoCacheForAvatar;
-    public MutableLiveData<Result> mutableLiveDataLogoutAllResult;
-    public MutableLiveData<ArrayList<Room>> mutableLiveDataAllRooms;
-    public MutableLiveData<Result> mutableLiveDataAllRoomsError;
-    public MutableLiveData<ArrayList<Room>> mutableLiveDataRoomSearchResult;
-    public MutableLiveData<ArrayList<User>> mutableLiveDataUserSearchResult;
-    public MutableLiveData<Result> mutableLiveDataCreateRoomResult;
-    public MutableLiveData<Result> mutableLiveDataLeaveRoomResult;
-    public MutableLiveData<Room> mutableLiveDataJoinRoomResult;
-    public MutableLiveData<Result> mutableLiveDataJoinRoomError;
-    public MutableLiveData<Result> mutableLiveDataConnectedToSocket;
-    public MutableLiveData<ArrayList<Chat>> mutableLiveDataChats;
-    public MutableLiveData<Room> mutableLiveDataRoom;
+    public MutableLiveData<Event<Result>> mutableLiveDataSignUpResult;
+    public MutableLiveData<Event<Result>> mutableLiveDataLoginResult;
+    public MutableLiveData<Event<Result>> mutableLiveDataForgotPasswordResult;
+    public MutableLiveData<Event<Result>> mutableLiveDataResetPasswordResult;
+    public MutableLiveData<Event<Result>> mutableLiveDataLogoutResult;
+    public MutableLiveData<Event<Result>> mutableLiveDataUpdateAvatarResult;
+    public MutableLiveData<Event<Result>> mutableLiveDataShouldClearPicassoCacheForAvatar;
+    public MutableLiveData<Event<Result>> mutableLiveDataLogoutAllResult;
+    public MutableLiveData<Event<ArrayList<Room>>> mutableLiveDataAllRooms;
+    public MutableLiveData<Event<Result>> mutableLiveDataAllRoomsError;
+    public MutableLiveData<Event<ArrayList<Room>>> mutableLiveDataRoomSearchResult;
+    public MutableLiveData<Event<ArrayList<User>>> mutableLiveDataUserSearchResult;
+    public MutableLiveData<Event<Result>> mutableLiveDataCreateRoomResult;
+    public MutableLiveData<Event<Result>> mutableLiveDataLeaveRoomResult;
+    public MutableLiveData<Event<Room>> mutableLiveDataJoinRoomResult;
+    public MutableLiveData<Event<Result>> mutableLiveDataJoinRoomError;
+    public MutableLiveData<Event<Result>> mutableLiveDataConnectedToSocket;
+    public MutableLiveData<Event<ArrayList<Chat>>> mutableLiveDataChats;
+    public MutableLiveData<Event<Room>> mutableLiveDataRoom;
 
     private ArrayList<Disposable> searchRoomDisposablesList;
 
@@ -148,50 +148,34 @@ public class Repository {
                                         e.printStackTrace();
                                     }
                                     mutableLiveDataSignUpResult.postValue(
-                                            new Result(
-                                                    Enums.Result.SUCCESS, ""
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.SUCCESS, ""
+                                                    )
                                             )
                                     );
                                 } else {
                                     mutableLiveDataSignUpResult.postValue(
-                                            new Result(
-                                                    Enums.Result.FAIL,
-                                                    getErrorMessage(responseBodyResponse.errorBody())
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.FAIL,
+                                                            getErrorMessage(responseBodyResponse.errorBody())
+                                                    )
                                             )
                                     );
                                 }
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                            mutableLiveDataSignUpResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
                             public void onError(Throwable e) {
                                 mutableLiveDataSignUpResult.postValue(
-                                        new Result(
-                                                Enums.Result.FAIL,
-                                                getErrorMessage(e)
+                                        new Event<>(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(e)
+                                                )
                                         )
                                 );
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataSignUpResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -230,50 +214,34 @@ public class Repository {
                                         e.printStackTrace();
                                     }
                                     mutableLiveDataLoginResult.postValue(
-                                            new Result(
-                                                    Enums.Result.SUCCESS, ""
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.SUCCESS, ""
+                                                    )
                                             )
                                     );
                                 } else {
                                     mutableLiveDataLoginResult.postValue(
-                                            new Result(
-                                                    Enums.Result.FAIL,
-                                                    getErrorMessage(responseBodyResponse.errorBody())
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.FAIL,
+                                                            getErrorMessage(responseBodyResponse.errorBody())
+                                                    )
                                             )
                                     );
                                 }
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                            mutableLiveDataLoginResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
                             public void onError(Throwable e) {
                                 mutableLiveDataLoginResult.postValue(
-                                        new Result(
-                                                Enums.Result.FAIL,
-                                                getErrorMessage(e)
+                                        new Event<>(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(e)
+                                                )
                                         )
                                 );
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataLoginResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -301,51 +269,35 @@ public class Repository {
                             public void onNext(Response<ResponseBody> responseBodyResponse) {
                                 if (responseBodyResponse.code() == 200) {
                                     mutableLiveDataForgotPasswordResult.postValue(
-                                            new Result(
-                                                    Enums.Result.SUCCESS,
-                                                    "Otp is sent to your email"
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.SUCCESS,
+                                                            "Otp is sent to your email"
+                                                    )
                                             )
                                     );
                                 } else {
                                     mutableLiveDataForgotPasswordResult.postValue(
-                                            new Result(
-                                                    Enums.Result.FAIL,
-                                                    getErrorMessage(responseBodyResponse.errorBody())
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.FAIL,
+                                                            getErrorMessage(responseBodyResponse.errorBody())
+                                                    )
                                             )
                                     );
                                 }
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                            mutableLiveDataForgotPasswordResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
                             public void onError(Throwable e) {
                                 mutableLiveDataForgotPasswordResult.postValue(
-                                        new Result(
-                                                Enums.Result.FAIL,
-                                                getErrorMessage(e)
+                                        new Event<>(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(e)
+                                                )
                                         )
                                 );
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataForgotPasswordResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -373,51 +325,35 @@ public class Repository {
                             public void onNext(Response<ResponseBody> responseBodyResponse) {
                                 if (responseBodyResponse.code() == 200) {
                                     mutableLiveDataResetPasswordResult.postValue(
-                                            new Result(
-                                                    Enums.Result.SUCCESS,
-                                                    "Your password has been reset successfully"
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.SUCCESS,
+                                                            "Your password has been reset successfully"
+                                                    )
                                             )
                                     );
                                 } else {
                                     mutableLiveDataResetPasswordResult.postValue(
-                                            new Result(
-                                                    Enums.Result.FAIL,
-                                                    getErrorMessage(responseBodyResponse.errorBody())
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.FAIL,
+                                                            getErrorMessage(responseBodyResponse.errorBody())
+                                                    )
                                             )
                                     );
                                 }
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e) {
-                                                e.printStackTrace();
-                                            }
-                                            mutableLiveDataResetPasswordResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
                             public void onError(Throwable e) {
                                 mutableLiveDataResetPasswordResult.postValue(
-                                        new Result(
-                                                Enums.Result.FAIL,
-                                                getErrorMessage(e)
+                                        new Event<>(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(e)
+                                                )
                                         )
                                 );
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataResetPasswordResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -448,62 +384,35 @@ public class Repository {
                                 else if (responseBodyResponse.code() == 200) {
                                     clearAllData();
                                     mutableLiveDataLogoutResult.postValue(
-                                            new Result(
-                                                    Enums.Result.SUCCESS,
-                                                    ""
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.SUCCESS,
+                                                            ""
+                                                    )
                                             )
                                     );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataLogoutResult.postValue(null);
-                                            }
-                                    ).start();
                                 } else {
                                     mutableLiveDataLogoutResult.postValue(
-                                            new Result(
-                                                    Enums.Result.FAIL,
-                                                    getErrorMessage(responseBodyResponse.errorBody())
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.FAIL,
+                                                            getErrorMessage(responseBodyResponse.errorBody())
+                                                    )
                                             )
                                     );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataLogoutResult.postValue(null);
-                                            }
-                                    ).start();
                                 }
                             }
 
                             @Override
                             public void onError(Throwable e) {
                                 mutableLiveDataLogoutResult.postValue(
-                                        new Result(
-                                                Enums.Result.FAIL,
-                                                getErrorMessage(e)
+                                        new Event<>(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(e)
+                                                )
                                         )
                                 );
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataLogoutResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -534,66 +443,39 @@ public class Repository {
                                     notAuthorised();
                                 else if (responseBodyResponse.code() == 200) {
                                     mutableLiveDataUpdateAvatarResult.postValue(
-                                            new Result(
-                                                    Enums.Result.SUCCESS,
-                                                    ""
-                                            )
-                                    );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataUpdateAvatarResult.postValue(null);
-                                            }
-                                    ).start();
-                                } else {
-                                    mutableLiveDataUpdateAvatarResult.postValue(
-                                            new Result(
-                                                    Enums.Result.FAIL,
-                                                    getErrorMessage(
-                                                            responseBodyResponse.errorBody()
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.SUCCESS,
+                                                            ""
                                                     )
                                             )
                                     );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e) {
-                                                    e.printStackTrace();
-                                                }
-                                                mutableLiveDataUpdateAvatarResult.postValue(null);
-                                            }
-                                    ).start();
+                                } else {
+                                    mutableLiveDataUpdateAvatarResult.postValue(
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.FAIL,
+                                                            getErrorMessage(
+                                                                    responseBodyResponse.errorBody()
+                                                            )
+                                                    )
+                                            )
+                                    );
                                 }
                             }
 
                             @Override
                             public void onError(Throwable e) {
                                 mutableLiveDataUpdateAvatarResult.postValue(
-                                        new Result(
-                                                Enums.Result.FAIL,
-                                                getErrorMessage(
-                                                        e
+                                        new Event<>(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(
+                                                                e
+                                                        )
                                                 )
                                         )
                                 );
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataUpdateAvatarResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -708,14 +590,18 @@ public class Repository {
                                                 )
                                         ) {
                                             mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
-                                                    new Result(
-                                                            Enums.Result.SUCCESS, ""
+                                                    new Event<>(
+                                                            new Result(
+                                                                    Enums.Result.SUCCESS, ""
+                                                            )
                                                     )
                                             );
                                         } else {
                                             mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
-                                                    new Result(
-                                                            Enums.Result.FAIL, ""
+                                                    new Event<>(
+                                                            new Result(
+                                                                    Enums.Result.FAIL, ""
+                                                            )
                                                     )
                                             );
                                         }
@@ -728,15 +614,19 @@ public class Repository {
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                         mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
-                                                new Result(
-                                                        Enums.Result.FAIL, ""
+                                                new Event<>(
+                                                        new Result(
+                                                                Enums.Result.FAIL, ""
+                                                        )
                                                 )
                                         );
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                         mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
-                                                new Result(
-                                                        Enums.Result.FAIL, ""
+                                                new Event<>(
+                                                        new Result(
+                                                                Enums.Result.FAIL, ""
+                                                        )
                                                 )
                                         );
                                     }
@@ -745,22 +635,13 @@ public class Repository {
                                         //the picture is not present
                                     } else {
                                         mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(
-                                                new Result(
-                                                        Enums.Result.FAIL, ""
+                                                new Event<>(
+                                                        new Result(
+                                                                Enums.Result.FAIL, ""
+                                                        )
                                                 )
                                         );
                                     }
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataShouldClearPicassoCacheForAvatar.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -795,44 +676,26 @@ public class Repository {
                                     notAuthorised();
                                 else {
                                     mutableLiveDataLogoutAllResult.postValue(
-                                            new Result(
-                                                    Enums.Result.FAIL,
-                                                    getErrorMessage(responseBodyResponse.errorBody())
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.FAIL,
+                                                            getErrorMessage(responseBodyResponse.errorBody())
+                                                    )
                                             )
                                     );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                mutableLiveDataLogoutAllResult.postValue(null);
-                                            }
-                                    ).start();
                                 }
                             }
 
                             @Override
                             public void onError(Throwable e) {
                                 mutableLiveDataLogoutAllResult.postValue(
-                                        new Result(
-                                                Enums.Result.FAIL,
-                                                getErrorMessage(e)
+                                        new Event<>(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(e)
+                                                )
                                         )
                                 );
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataLogoutAllResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -871,95 +734,50 @@ public class Repository {
                                         );
 
                                         mutableLiveDataAllRooms.postValue(
-                                                rooms
+                                                new Event<>(
+                                                        rooms
+                                                )
                                         );
-
-                                        new Thread(
-                                                () -> {
-                                                    try {
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e1) {
-                                                        e1.printStackTrace();
-                                                    }
-                                                    mutableLiveDataAllRooms.postValue(null);
-                                                }
-                                        ).start();
                                     } catch (IOException e) {
                                         e.printStackTrace();
 
                                         mutableLiveDataAllRoomsError.postValue(
-                                                new Result(
-                                                        Enums.Result.FAIL,
-                                                        getErrorMessage(e)
+                                                new Event<>(
+                                                        new Result(
+                                                                Enums.Result.FAIL,
+                                                                getErrorMessage(e)
+                                                        )
                                                 )
                                         );
-
-                                        new Thread(
-                                                () -> {
-                                                    try {
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e1) {
-                                                        e1.printStackTrace();
-                                                    }
-                                                    mutableLiveDataAllRoomsError.postValue(null);
-                                                }
-                                        ).start();
                                     }
                                 } else if (responseBodyResponse.code() == 204) {
                                     mutableLiveDataAllRooms.postValue(
-                                            new ArrayList<>()
-                                    );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                mutableLiveDataAllRooms.postValue(null);
-                                            }
-                                    ).start();
-                                } else {
-                                    mutableLiveDataAllRoomsError.postValue(
-                                            new Result(
-                                                    Enums.Result.FAIL,
-                                                    getErrorMessage(responseBodyResponse.errorBody())
+                                            new Event<>(
+                                                    new ArrayList<>()
                                             )
                                     );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                mutableLiveDataAllRoomsError.postValue(null);
-                                            }
-                                    ).start();
+                                } else {
+                                    mutableLiveDataAllRoomsError.postValue(
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.FAIL,
+                                                            getErrorMessage(responseBodyResponse.errorBody())
+                                                    )
+                                            )
+                                    );
                                 }
                             }
 
                             @Override
                             public void onError(Throwable throwable) {
                                 mutableLiveDataAllRoomsError.postValue(
-                                        new Result(
-                                                Enums.Result.FAIL,
-                                                getErrorMessage(throwable)
+                                        new Event<>(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(throwable)
+                                                )
                                         )
                                 );
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataAllRoomsError.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -1005,38 +823,20 @@ public class Repository {
                                         );
 
                                         mutableLiveDataRoomSearchResult.postValue(
-                                                rooms
+                                                new Event<>(
+                                                        rooms
+                                                )
                                         );
-
-                                        new Thread(
-                                                () -> {
-                                                    try {
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e1) {
-                                                        e1.printStackTrace();
-                                                    }
-                                                    mutableLiveDataRoomSearchResult.postValue(null);
-                                                }
-                                        ).start();
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
                                 } else if (responseBodyResponse.code() == 204) {
 
                                     mutableLiveDataRoomSearchResult.postValue(
-                                            new ArrayList<>()
+                                            new Event<>(
+                                                    new ArrayList<>()
+                                            )
                                     );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                mutableLiveDataRoomSearchResult.postValue(null);
-                                            }
-                                    ).start();
                                 }
                             }
 
@@ -1100,36 +900,20 @@ public class Repository {
                                                 }.getType()
                                         );
 
-                                        mutableLiveDataUserSearchResult.postValue(users);
-
-                                        new Thread(
-                                                () -> {
-                                                    try {
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e1) {
-                                                        e1.printStackTrace();
-                                                    }
-                                                    mutableLiveDataUserSearchResult.postValue(null);
-                                                }
-                                        ).start();
+                                        mutableLiveDataUserSearchResult.postValue(
+                                                new Event<>(
+                                                        users
+                                                )
+                                        );
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
                                 } else if (responseBodyResponse.code() == 204) {
                                     mutableLiveDataUserSearchResult.postValue(
-                                            new ArrayList<>()
+                                            new Event<>(
+                                                    new ArrayList<>()
+                                            )
                                     );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                mutableLiveDataUserSearchResult.postValue(null);
-                                            }
-                                    ).start();
                                 }
                             }
 
@@ -1172,62 +956,35 @@ public class Repository {
                                     notAuthorised();
                                 else if (responseBodyResponse.code() == 200) {
                                     mutableLiveDataCreateRoomResult.postValue(
-                                            new Result(
-                                                    Enums.Result.SUCCESS,
-                                                    ""
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.SUCCESS,
+                                                            ""
+                                                    )
                                             )
                                     );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                mutableLiveDataCreateRoomResult.postValue(null);
-                                            }
-                                    ).start();
                                 } else {
                                     mutableLiveDataCreateRoomResult.postValue(
-                                            new Result(
-                                                    Enums.Result.FAIL,
-                                                    getErrorMessage(responseBodyResponse.errorBody())
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.FAIL,
+                                                            getErrorMessage(responseBodyResponse.errorBody())
+                                                    )
                                             )
                                     );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                mutableLiveDataCreateRoomResult.postValue(null);
-                                            }
-                                    ).start();
                                 }
                             }
 
                             @Override
                             public void onError(Throwable throwable) {
                                 mutableLiveDataCreateRoomResult.postValue(
-                                        new Result(
-                                                Enums.Result.FAIL,
-                                                getErrorMessage(throwable)
+                                        new Event<>(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(throwable)
+                                                )
                                         )
                                 );
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataCreateRoomResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -1260,66 +1017,39 @@ public class Repository {
                                         responseBodyResponse.code() == 200
                                 ) {
                                     mutableLiveDataLeaveRoomResult.postValue(
-                                            new Result(
-                                                    Enums.Result.SUCCESS,
-                                                    ""
-                                            )
-                                    );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                mutableLiveDataLeaveRoomResult.postValue(null);
-                                            }
-                                    ).start();
-                                } else {
-                                    mutableLiveDataLeaveRoomResult.postValue(
-                                            new Result(
-                                                    Enums.Result.FAIL,
-                                                    getErrorMessage(
-                                                            responseBodyResponse.errorBody()
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.SUCCESS,
+                                                            ""
                                                     )
                                             )
                                     );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                mutableLiveDataLeaveRoomResult.postValue(null);
-                                            }
-                                    ).start();
+                                } else {
+                                    mutableLiveDataLeaveRoomResult.postValue(
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.FAIL,
+                                                            getErrorMessage(
+                                                                    responseBodyResponse.errorBody()
+                                                            )
+                                                    )
+                                            )
+                                    );
                                 }
                             }
 
                             @Override
                             public void onError(Throwable throwable) {
                                 mutableLiveDataLeaveRoomResult.postValue(
-                                        new Result(
-                                                Enums.Result.FAIL,
-                                                getErrorMessage(
-                                                        throwable
+                                        new Event<>(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(
+                                                                throwable
+                                                        )
                                                 )
                                         )
                                 );
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataLeaveRoomResult.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -1354,88 +1084,52 @@ public class Repository {
                                     try {
                                         //noinspection ConstantConditions
                                         mutableLiveDataJoinRoomResult.postValue(
-                                                new Gson().fromJson(
-                                                        responseBodyResponse.body().string(),
-                                                        Room.class
-                                                )
-                                        );
-
-                                        new Thread(
-                                                () -> {
-                                                    try {
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e1) {
-                                                        e1.printStackTrace();
-                                                    }
-                                                    mutableLiveDataJoinRoomResult.postValue(null);
-                                                }
-                                        ).start();
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                        mutableLiveDataJoinRoomError.postValue(
-                                                new Result(
-                                                        Enums.Result.FAIL,
-                                                        getErrorMessage(
-                                                                e
+                                                new Event<>(
+                                                        new Gson().fromJson(
+                                                                responseBodyResponse.body().string(),
+                                                                Room.class
                                                         )
                                                 )
                                         );
-
-                                        new Thread(
-                                                () -> {
-                                                    try {
-                                                        Thread.sleep(1000);
-                                                    } catch (InterruptedException e1) {
-                                                        e1.printStackTrace();
-                                                    }
-                                                    mutableLiveDataJoinRoomError.postValue(null);
-                                                }
-                                        ).start();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        mutableLiveDataJoinRoomError.postValue(
+                                                new Event<>(
+                                                        new Result(
+                                                                Enums.Result.FAIL,
+                                                                getErrorMessage(
+                                                                        e
+                                                                )
+                                                        )
+                                                )
+                                        );
                                     }
                                 } else {
                                     mutableLiveDataJoinRoomError.postValue(
-                                            new Result(
-                                                    Enums.Result.FAIL,
-                                                    getErrorMessage(
-                                                            responseBodyResponse.errorBody()
+                                            new Event<>(
+                                                    new Result(
+                                                            Enums.Result.FAIL,
+                                                            getErrorMessage(
+                                                                    responseBodyResponse.errorBody()
+                                                            )
                                                     )
                                             )
                                     );
-
-                                    new Thread(
-                                            () -> {
-                                                try {
-                                                    Thread.sleep(1000);
-                                                } catch (InterruptedException e1) {
-                                                    e1.printStackTrace();
-                                                }
-                                                mutableLiveDataJoinRoomError.postValue(null);
-                                            }
-                                    ).start();
                                 }
                             }
 
                             @Override
                             public void onError(Throwable throwable) {
                                 mutableLiveDataJoinRoomError.postValue(
-                                        new Result(
-                                                Enums.Result.FAIL,
-                                                getErrorMessage(
-                                                        throwable
+                                        new Event<>(
+                                                new Result(
+                                                        Enums.Result.FAIL,
+                                                        getErrorMessage(
+                                                                throwable
+                                                        )
                                                 )
                                         )
                                 );
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataJoinRoomError.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -1467,26 +1161,17 @@ public class Repository {
                                 else if (responseBodyResponse.code() == 200) {
                                     try {
                                         mutableLiveDataRoom.postValue(
-                                                new Gson().fromJson(
-                                                        responseBodyResponse.body().string(),
-                                                        Room.class
+                                                new Event<>(
+                                                        new Gson().fromJson(
+                                                                responseBodyResponse.body().string(),
+                                                                Room.class
+                                                        )
                                                 )
                                         );
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
                                 }
-
-                                new Thread(
-                                        () -> {
-                                            try {
-                                                Thread.sleep(1000);
-                                            } catch (InterruptedException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                            mutableLiveDataRoom.postValue(null);
-                                        }
-                                ).start();
                             }
 
                             @Override
@@ -1828,7 +1513,9 @@ public class Repository {
 
     private void connectedToSocket() {
         mutableLiveDataConnectedToSocket.postValue(
-                new Result()
+                new Event<>(
+                        new Result()
+                )
         );
 
         new Thread(
@@ -1900,7 +1587,11 @@ public class Repository {
                 }.getType()
         );
 
-        mutableLiveDataChats.postValue(chatToSend);
+        mutableLiveDataChats.postValue(
+                new Event<>(
+                        chatToSend
+                )
+        );
 
         new Thread(
                 () -> {
@@ -1921,7 +1612,11 @@ public class Repository {
                 }.getType()
         );
 
-        mutableLiveDataChats.postValue(result.get(0));
+        mutableLiveDataChats.postValue(
+                new Event<>(
+                        result.get(0)
+                )
+        );
 
         new Thread(
                 () -> {

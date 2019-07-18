@@ -75,8 +75,8 @@ public class Login extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processLoginResult(result);
+                            if (result.shouldReadContent())
+                                processLoginResult(result.getContent());
                         }
                 );
     }

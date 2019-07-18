@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.User;
+import com.sagar.android.chatapp.repository.Event;
 import com.sagar.android.chatapp.repository.Repository;
 
 import java.util.ArrayList;
@@ -12,8 +13,8 @@ import java.util.ArrayList;
 public class CreateRoomViewModel extends ViewModel {
     private Repository repository;
 
-    public MediatorLiveData<ArrayList<User>> mediatorLiveDataSearchUserResult;
-    public MediatorLiveData<Result> mediatorLiveDataCreateRoomResult;
+    public MediatorLiveData<Event<ArrayList<User>>> mediatorLiveDataSearchUserResult;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataCreateRoomResult;
 
     public CreateRoomViewModel(Repository repository) {
         this.repository = repository;

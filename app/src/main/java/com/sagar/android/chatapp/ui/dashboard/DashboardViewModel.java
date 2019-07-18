@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.Room;
 import com.sagar.android.chatapp.model.UserData;
+import com.sagar.android.chatapp.repository.Event;
 import com.sagar.android.chatapp.repository.Repository;
 
 import java.util.ArrayList;
@@ -13,11 +14,11 @@ import java.util.ArrayList;
 public class DashboardViewModel extends ViewModel {
     private Repository repository;
 
-    public MediatorLiveData<Result> mediatorLiveDataLogoutResult;
-    public MediatorLiveData<Result> mediatorLiveDataShouldClearPicassoCacheForAvatar;
-    public MediatorLiveData<ArrayList<Room>> mediatorLiveDataAllRooms;
-    public MediatorLiveData<Result> mediatorLiveDataAllRoomsError;
-    public MediatorLiveData<ArrayList<Room>> mediatorLiveDataRoomSearchResult;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataLogoutResult;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataShouldClearPicassoCacheForAvatar;
+    public MediatorLiveData<Event<ArrayList<Room>>> mediatorLiveDataAllRooms;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataAllRoomsError;
+    public MediatorLiveData<Event<ArrayList<Room>>> mediatorLiveDataRoomSearchResult;
 
     public DashboardViewModel(Repository repository) {
         this.repository = repository;

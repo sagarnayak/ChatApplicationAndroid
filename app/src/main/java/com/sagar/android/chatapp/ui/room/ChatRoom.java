@@ -176,8 +176,8 @@ public class ChatRoom extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processLeaveRoomResult(result);
+                            if (result.shouldReadContent())
+                                processLeaveRoomResult(result.getContent());
                         }
                 );
 
@@ -185,8 +185,8 @@ public class ChatRoom extends AppCompatActivity {
                 .observe(
                         this,
                         room -> {
-                            if (room != null)
-                                processJoinRoomResult(room);
+                            if (room.shouldReadContent())
+                                processJoinRoomResult(room.getContent());
                         }
                 );
 
@@ -194,8 +194,8 @@ public class ChatRoom extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processJoinRoomError(result);
+                            if (result.shouldReadContent())
+                                processJoinRoomError(result.getContent());
                         }
                 );
 
@@ -203,8 +203,10 @@ public class ChatRoom extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
+                            if (result.shouldReadContent()) {
+                                result.readContent();
                                 processConnectedToSocketResponse();
+                            }
                         }
                 );
 
@@ -212,8 +214,8 @@ public class ChatRoom extends AppCompatActivity {
                 .observe(
                         this,
                         chats -> {
-                            if (chats != null)
-                                gotNewChats(chats);
+                            if (chats.shouldReadContent())
+                                gotNewChats(chats.getContent());
                         }
                 );
 
@@ -221,8 +223,8 @@ public class ChatRoom extends AppCompatActivity {
                 .observe(
                         this,
                         room -> {
-                            if (room != null)
-                                processRoomData(room);
+                            if (room.shouldReadContent())
+                                processRoomData(room.getContent());
                         }
                 );
     }

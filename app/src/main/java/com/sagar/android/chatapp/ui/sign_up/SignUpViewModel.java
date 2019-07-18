@@ -5,13 +5,14 @@ import androidx.lifecycle.ViewModel;
 
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.UserSignUpRequest;
+import com.sagar.android.chatapp.repository.Event;
 import com.sagar.android.chatapp.repository.Repository;
 
 public class SignUpViewModel extends ViewModel {
 
     private Repository repository;
 
-    public MediatorLiveData<Result> mediatorLiveDataSignUpResult;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataSignUpResult;
 
     public SignUpViewModel(Repository repository) {
         this.repository = repository;

@@ -7,7 +7,6 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.sagar.android.chatapp.R;
@@ -86,8 +85,8 @@ public class ResetPasswordWithOtp extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processResetPasswordResult(result);
+                            if (result.shouldReadContent())
+                                processResetPasswordResult(result.getContent());
                         }
                 );
     }

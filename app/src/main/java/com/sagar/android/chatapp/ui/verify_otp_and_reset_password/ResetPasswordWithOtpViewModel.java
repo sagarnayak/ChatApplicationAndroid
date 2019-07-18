@@ -5,12 +5,13 @@ import androidx.lifecycle.ViewModel;
 
 import com.sagar.android.chatapp.model.ResetPasswordRequest;
 import com.sagar.android.chatapp.model.Result;
+import com.sagar.android.chatapp.repository.Event;
 import com.sagar.android.chatapp.repository.Repository;
 
 public class ResetPasswordWithOtpViewModel extends ViewModel {
     private Repository repository;
 
-    public MediatorLiveData<Result> mediatorLiveDataResetPasswordResult;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataResetPasswordResult;
 
     public ResetPasswordWithOtpViewModel(Repository repository) {
         this.repository = repository;

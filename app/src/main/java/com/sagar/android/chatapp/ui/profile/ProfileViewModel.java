@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.sagar.android.chatapp.model.Result;
 import com.sagar.android.chatapp.model.UserData;
+import com.sagar.android.chatapp.repository.Event;
 import com.sagar.android.chatapp.repository.Repository;
 
 import okhttp3.MultipartBody;
@@ -12,8 +13,8 @@ import okhttp3.MultipartBody;
 public class ProfileViewModel extends ViewModel {
     public Repository repository;
 
-    public MediatorLiveData<Result> mediatorLiveDataUpdateAvatarResult;
-    public MediatorLiveData<Result> mediatorLiveDataShouldClearPicassoCacheForAvatar;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataUpdateAvatarResult;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataShouldClearPicassoCacheForAvatar;
 
     public ProfileViewModel(Repository repository) {
         this.repository = repository;

@@ -4,12 +4,13 @@ import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.sagar.android.chatapp.model.Result;
+import com.sagar.android.chatapp.repository.Event;
 import com.sagar.android.chatapp.repository.Repository;
 
 public class ForgotPasswordViewModel extends ViewModel {
     private Repository repository;
 
-    public MediatorLiveData<Result> mediatorLiveDataForgotPasswordResult;
+    public MediatorLiveData<Event<Result>> mediatorLiveDataForgotPasswordResult;
 
     public ForgotPasswordViewModel(Repository repository) {
         this.repository = repository;

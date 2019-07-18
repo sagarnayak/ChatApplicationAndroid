@@ -78,8 +78,8 @@ public class Settings extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processLogoutAllResult(result);
+                            if (result.shouldReadContent())
+                                processLogoutAllResult(result.getContent());
                         }
                 );
     }

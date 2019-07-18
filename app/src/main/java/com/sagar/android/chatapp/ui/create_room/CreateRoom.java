@@ -353,8 +353,8 @@ public class CreateRoom extends AppCompatActivity {
                 .observe(
                         this,
                         users -> {
-                            if (users != null)
-                                processUserListResponse(users);
+                            if (users.shouldReadContent())
+                                processUserListResponse(users.getContent());
                         }
                 );
 
@@ -362,8 +362,8 @@ public class CreateRoom extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processCreateRoomResult(result);
+                            if (result.shouldReadContent())
+                                processCreateRoomResult(result.getContent());
                         }
                 );
     }

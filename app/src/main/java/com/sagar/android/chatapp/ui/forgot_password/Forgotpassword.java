@@ -94,8 +94,8 @@ public class Forgotpassword extends AppCompatActivity {
                 .observe(
                         this,
                         result -> {
-                            if (result != null)
-                                processForgotPasswordResult(result);
+                            if (result.shouldReadContent())
+                                processForgotPasswordResult(result.getContent());
                         }
                 );
     }
