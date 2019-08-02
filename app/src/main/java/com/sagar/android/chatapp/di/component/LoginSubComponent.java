@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface LoginSubComponent extends AndroidInjector<Login> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<Login> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<Login> {
     }
 }

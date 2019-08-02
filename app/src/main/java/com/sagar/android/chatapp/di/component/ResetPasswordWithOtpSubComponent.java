@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface ResetPasswordWithOtpSubComponent extends AndroidInjector<ResetPasswordWithOtp> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<ResetPasswordWithOtp> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<ResetPasswordWithOtp> {
     }
 }

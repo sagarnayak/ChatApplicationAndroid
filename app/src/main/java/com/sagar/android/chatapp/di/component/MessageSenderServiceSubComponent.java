@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface MessageSenderServiceSubComponent extends AndroidInjector<MessageSenderService> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<MessageSenderService> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<MessageSenderService> {
     }
 }

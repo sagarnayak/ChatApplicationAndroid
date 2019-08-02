@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface CreateRoomSubComponent extends AndroidInjector<CreateRoom> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<CreateRoom> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<CreateRoom> {
     }
 }

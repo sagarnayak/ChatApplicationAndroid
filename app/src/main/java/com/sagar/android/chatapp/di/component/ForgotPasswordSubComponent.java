@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface ForgotPasswordSubComponent extends AndroidInjector<Forgotpassword> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<Forgotpassword> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<Forgotpassword> {
     }
 }

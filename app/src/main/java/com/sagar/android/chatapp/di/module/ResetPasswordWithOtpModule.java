@@ -10,14 +10,15 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@ResetPasswordWithOtpScope
 public class ResetPasswordWithOtpModule {
     @Provides
+    @ResetPasswordWithOtpScope
     ResetPasswordWithOtpViewModelProvider viewModelProvider(Repository repository) {
         return new ResetPasswordWithOtpViewModelProvider(repository);
     }
 
     @Provides
+    @ResetPasswordWithOtpScope
     ProgressUtil progressUtil(ResetPasswordWithOtp context) {
         return new ProgressUtil(context);
     }

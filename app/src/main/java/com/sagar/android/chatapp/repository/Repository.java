@@ -1517,23 +1517,15 @@ public class Repository {
                         new Result()
                 )
         );
-
-        new Thread(
-                () -> {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
-                    mutableLiveDataConnectedToSocket.postValue(null);
-                }
-        ).start();
     }
 
     public void disconnectSocket() {
         try {
-            socket.disconnect();
-            socket.off();
+            if (socket != null) {
+                socket.disconnect();
+                socket.off();
+                socket = null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1592,17 +1584,6 @@ public class Repository {
                         chatToSend
                 )
         );
-
-        new Thread(
-                () -> {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
-                    mutableLiveDataChats.postValue(null);
-                }
-        ).start();
     }
 
     public void gotNewChats(Object... chats) {
@@ -1617,17 +1598,6 @@ public class Repository {
                         result.get(0)
                 )
         );
-
-        new Thread(
-                () -> {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e1) {
-                        e1.printStackTrace();
-                    }
-                    mutableLiveDataChats.postValue(null);
-                }
-        ).start();
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 }

@@ -10,14 +10,15 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@ForgotPasswordScope
 public class ForgotPasswordModule {
     @Provides
+    @ForgotPasswordScope
     ForgotPasswordViewModelProvider viewModelProvider(Repository repository) {
         return new ForgotPasswordViewModelProvider(repository);
     }
 
     @Provides
+    @ForgotPasswordScope
     ProgressUtil progressUtil(Forgotpassword context) {
         return new ProgressUtil(context);
     }

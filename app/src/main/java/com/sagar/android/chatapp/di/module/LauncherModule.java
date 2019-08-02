@@ -8,9 +8,9 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@LauncherScope
 public class LauncherModule {
     @Provides
+    @LauncherScope
     LauncherViewModelProvider viewModelProvider(Repository repository) {
         return new LauncherViewModelProvider(repository);
     }

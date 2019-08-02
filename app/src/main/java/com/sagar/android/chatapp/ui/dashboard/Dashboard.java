@@ -103,6 +103,7 @@ public class Dashboard extends AppCompatActivity {
         }
     };
 
+    @SuppressWarnings("FieldCanBeLocal")
     private LinearLayoutManager linearLayoutManager;
     private RoomListAdapter roomListAdapter;
     private ArrayList<Room> allRoomsList;
@@ -189,7 +190,13 @@ public class Dashboard extends AppCompatActivity {
             item_search.collapseActionView();
             return;
         }
+        unRegisterReceivers();
         finish();
+    }
+
+    private void unRegisterReceivers() {
+        unregisterReceiver(receiverAvatarUpdated);
+        unregisterReceiver(receiverAvatarUpdatedForUser);
     }
 
     public void onClickCreateRoom(View view) {
@@ -320,6 +327,7 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void gotoCreateRoom() {
+        unRegisterReceivers();
         startActivity(
                 new Intent(this, CreateRoom.class)
         );
@@ -327,6 +335,7 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void gotoProfile() {
+        unRegisterReceivers();
         startActivity(
                 new Intent(this, Profile.class)
         );
@@ -348,6 +357,7 @@ public class Dashboard extends AppCompatActivity {
     private void processLogoutResult(Result result) {
         progressUtil.hide();
         if (result.getResult() == Enums.Result.SUCCESS) {
+            unRegisterReceivers();
             startActivity(
                     new Intent(this, Login.class)
             );
@@ -457,9 +467,11 @@ public class Dashboard extends AppCompatActivity {
 
         // set the cursor
 
+        //noinspection unused
         @SuppressLint("CutPasteId") AutoCompleteTextView searchTextView =
                 searchView.findViewById(androidx.appcompat.R.id.search_src_text);
         try {
+            //noinspection JavaReflectionMemberAccess
             Field mCursorDrawableRes = TextView.class.getDeclaredField("mCursorDrawableRes");
             mCursorDrawableRes.setAccessible(true);
 //            mCursorDrawableRes.set(searchTextView, R.drawable.search_cursor);
@@ -534,7 +546,7 @@ public class Dashboard extends AppCompatActivity {
 
     @SuppressLint("PrivateResource")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void circleReveal(int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
+    public void circleReveal(@SuppressWarnings("unused") int viewID, int posFromRight, boolean containsOverflow, final boolean isShow) {
         final View myView = binding.searchToolBarLayout.searchToolbar;
 
         int width = myView.getWidth();
@@ -740,6 +752,7 @@ public class Dashboard extends AppCompatActivity {
     }
 
     private void gotoChat(Room room) {
+        unRegisterReceivers();
         startActivity(
                 new Intent(
                         this,

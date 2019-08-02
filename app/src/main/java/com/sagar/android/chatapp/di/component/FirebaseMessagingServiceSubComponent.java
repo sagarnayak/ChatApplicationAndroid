@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface FirebaseMessagingServiceSubComponent extends AndroidInjector<PushNotificationHandler> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<PushNotificationHandler> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<PushNotificationHandler> {
     }
 }

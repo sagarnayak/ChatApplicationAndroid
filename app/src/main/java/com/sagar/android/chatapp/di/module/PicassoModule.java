@@ -13,12 +13,12 @@ import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 
 @Module
-@ApplicationScope
 public class PicassoModule {
 
     @Provides
+    @ApplicationScope
     Picasso picasso(Repository repository, Application context) {
-        return new Picasso.Builder(context)
+        Picasso picasso = new Picasso.Builder(context)
                 .downloader(
                         new OkHttp3Downloader(
                                 new OkHttpClient.Builder()
@@ -41,5 +41,9 @@ public class PicassoModule {
                         )
                 )
                 .build();
+        picasso.setLoggingEnabled(true);
+        picasso.setIndicatorsEnabled(true);
+
+        return picasso;
     }
 }

@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface ProfileSubComponent extends AndroidInjector<Profile> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<Profile> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<Profile> {
     }
 }

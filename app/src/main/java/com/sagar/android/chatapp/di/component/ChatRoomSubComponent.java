@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface ChatRoomSubComponent extends AndroidInjector<ChatRoom> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<ChatRoom> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<ChatRoom> {
     }
 }

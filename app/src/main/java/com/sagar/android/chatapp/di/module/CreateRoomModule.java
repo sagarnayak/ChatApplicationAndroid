@@ -10,14 +10,15 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@CreateRoomScope
 public class CreateRoomModule {
     @Provides
+    @CreateRoomScope
     CreateRoomViewModelProvider viewModelProvider(Repository repository) {
         return new CreateRoomViewModelProvider(repository);
     }
 
     @Provides
+    @CreateRoomScope
     ProgressUtil progressUtil(CreateRoom context) {
         return new ProgressUtil(context);
     }

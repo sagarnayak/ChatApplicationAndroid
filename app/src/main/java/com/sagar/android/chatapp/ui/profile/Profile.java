@@ -120,6 +120,7 @@ public class Profile extends AppCompatActivity {
     }
 
     private void backPressed() {
+        unregisterReceiver(receiver);
         startActivity(
                 new Intent(this, Dashboard.class)
         );
@@ -135,6 +136,7 @@ public class Profile extends AppCompatActivity {
                 null
         );
         int color = ColorUtil.MATERIAL.getColor(userData.getUser().getName());
+        //noinspection ConstantConditions
         drawable.setColorFilter(
                 color, PorterDuff.Mode.ADD
         );
@@ -171,7 +173,9 @@ public class Profile extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(
-            int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults
+            int requestCode,
+            @SuppressWarnings("NullableProblems") @NonNull String[] permissions,
+            @SuppressWarnings("NullableProblems") @NonNull int[] grantResults
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         // NOTE: delegate the permission handling to generated method
@@ -277,8 +281,8 @@ public class Profile extends AppCompatActivity {
     private void sendPictureToServer(File file) {
         progressUtil.show();
         okhttp3.RequestBody reqFilePic = RequestBody.create(
-                MediaType.parse("image/*"),
-                file
+                file,
+                MediaType.parse("image/*")
         );
         MultipartBody.Part bodyPic = MultipartBody.Part.createFormData("avatar", file.getName(), reqFilePic);
 

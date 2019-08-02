@@ -23,14 +23,15 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
-@ApplicationScope
 public class NetworkModule {
     @Provides
+    @ApplicationScope
     ApiInterface androidArchApiInterface(Retrofit retrofit) {
         return retrofit.create(ApiInterface.class);
     }
 
     @Provides
+    @ApplicationScope
     Retrofit retrofit(OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
                 .baseUrl(URLs.BASE_URL)
@@ -41,6 +42,7 @@ public class NetworkModule {
     }
 
     @Provides
+    @ApplicationScope
     OkHttpClient okHttpClient(HttpLoggingInterceptor httpLoggingInterceptor,
                               ResponseCacheInterceptor responseCacheInterceptor,
                               OfflineResponseCacheInterceptor offlineResponseCacheInterceptor,
@@ -54,6 +56,7 @@ public class NetworkModule {
     }
 
     @Provides
+    @ApplicationScope
     HttpLoggingInterceptor httpLoggingInterceptor(final LogUtil logUtil) {
         //noinspection NullableProblems
         HttpLoggingInterceptor httpLoggingInterceptor =
@@ -68,21 +71,25 @@ public class NetworkModule {
     }
 
     @Provides
+    @ApplicationScope
     ResponseCacheInterceptor responseCacheInterceptor(LogUtil logUtil) {
         return new ResponseCacheInterceptor(logUtil);
     }
 
     @Provides
+    @ApplicationScope
     OfflineResponseCacheInterceptor offlineResponseCacheInterceptor(Application application, LogUtil logUtil) {
         return new OfflineResponseCacheInterceptor(application, logUtil);
     }
 
     @Provides
+    @ApplicationScope
     Cache cache(File directory) {
         return new Cache(directory, 5 * 1024 * 1024);
     }
 
     @Provides
+    @ApplicationScope
     File file(Application application) {
         return new File(application.getCacheDir() + "apiResponse");
     }

@@ -11,10 +11,10 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@ApplicationScope
 public class NotificationMasterModule {
 
     @Provides
+    @ApplicationScope
     NotificationMaster notificationMaster(
             SharedPreferences preferences,
             Application application,

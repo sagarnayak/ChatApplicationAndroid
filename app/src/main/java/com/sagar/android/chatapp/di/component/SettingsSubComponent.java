@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface SettingsSubComponent extends AndroidInjector<Settings> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<Settings> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<Settings> {
     }
 }

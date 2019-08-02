@@ -10,14 +10,15 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@DashboardScope
 public class DashboardModule {
     @Provides
+    @DashboardScope
     DashboardViewModelProvider viewModelProvider(Repository repository) {
         return new DashboardViewModelProvider(repository);
     }
 
     @Provides
+    @DashboardScope
     ProgressUtil progressUtil(Dashboard context) {
         return new ProgressUtil(context);
     }

@@ -10,14 +10,15 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@SignUpScope
 public class SignUpModule {
     @Provides
+    @SignUpScope
     SignUpViewModelProvider viewModelProvider(Repository repository) {
         return new SignUpViewModelProvider(repository);
     }
 
     @Provides
+    @SignUpScope
     ProgressUtil progressUtil(SignUp context) {
         return new ProgressUtil(context);
     }

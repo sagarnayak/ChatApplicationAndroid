@@ -10,14 +10,15 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@ProfileScope
 public class ProfileModule {
     @Provides
+    @ProfileScope
     ProfileViewModelProvider viewModelProvider(Repository repository) {
         return new ProfileViewModelProvider(repository);
     }
 
     @Provides
+    @ProfileScope
     ProgressUtil progressUtil(Profile context) {
         return new ProgressUtil(context);
     }

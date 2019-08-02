@@ -12,10 +12,10 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@ApplicationScope
 public class RepositoryModule {
 
     @Provides
+    @ApplicationScope
     Repository repository(
             ApiInterface apiInterface,
             SharedPreferences preferences,

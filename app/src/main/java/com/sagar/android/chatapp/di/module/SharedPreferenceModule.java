@@ -11,10 +11,10 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@ApplicationScope
 public class SharedPreferenceModule {
 
     @Provides
+    @ApplicationScope
     public SharedPreferences sharedPreferences(Application application) {
         return application.getSharedPreferences(
                 KeyWordsAndConstants.SHARED_PREF_DB,

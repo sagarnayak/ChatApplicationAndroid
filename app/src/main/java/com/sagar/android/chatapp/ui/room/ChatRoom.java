@@ -136,6 +136,17 @@ public class ChatRoom extends AppCompatActivity {
         tryInitializingSocketAfterDelay();
     }
 
+    private void unRegisterReceivers() {
+        unregisterReceiver(receiverAvatarUpdatedForUser);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unRegisterReceivers();
+    }
+
     private void tryInitializingSocketAfterDelay() {
         new Handler().postDelayed(
                 () -> {
@@ -341,6 +352,7 @@ public class ChatRoom extends AppCompatActivity {
                         )
         );
 //        viewModel.disconnectSocket();
+
         finish();
     }
 

@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface LauncherSubComponent extends AndroidInjector<Launcher> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<Launcher> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<Launcher> {
     }
 }

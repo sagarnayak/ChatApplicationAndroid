@@ -10,14 +10,15 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@ChatRoomScope
 public class ChatRoomModule {
     @Provides
+    @ChatRoomScope
     ChatRoomViewModelProvider viewModelProvider(Repository repository) {
         return new ChatRoomViewModelProvider(repository);
     }
 
     @Provides
+    @ChatRoomScope
     ProgressUtil progressUtil(ChatRoom context) {
         return new ProgressUtil(context);
     }

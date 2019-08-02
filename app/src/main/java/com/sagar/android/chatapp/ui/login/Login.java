@@ -54,7 +54,7 @@ public class Login extends AppCompatActivity {
 
         if (BuildConfig.DEBUG) {
             binding.contentLogin.editTextUserName.setText("one@gmail.com");
-            binding.contentLogin.editTextPassword.setText("qwerty");
+            binding.contentLogin.editTextPassword.setText("sdfsvs");
         }
     }
 

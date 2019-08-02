@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface SignUpSubComponent extends AndroidInjector<SignUp> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<SignUp> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<SignUp> {
     }
 }

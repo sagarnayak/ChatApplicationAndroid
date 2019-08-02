@@ -10,10 +10,10 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-@ApplicationScope
 public class LogUtilModule {
 
     @Provides
+    @ApplicationScope
     LogUtil logUtil(Application application) {
         return new LogUtil.Builder().setCustomLogTag(KeyWordsAndConstants.LOG_TAG).build();
     }

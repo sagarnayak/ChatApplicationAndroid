@@ -14,7 +14,7 @@ import dagger.android.AndroidInjector;
         }
 )
 public interface DashboardSubComponent extends AndroidInjector<Dashboard> {
-    @Subcomponent.Builder
-    abstract class Builder extends AndroidInjector.Builder<Dashboard> {
+    @Subcomponent.Factory
+    interface Factory extends AndroidInjector.Factory<Dashboard> {
     }
 }
