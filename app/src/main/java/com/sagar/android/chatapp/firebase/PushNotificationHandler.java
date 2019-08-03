@@ -24,6 +24,8 @@ public class PushNotificationHandler extends FirebaseMessagingService {
     Repository repository;
     @Inject
     NotificationMaster notificationMaster;
+    @Inject
+    Picasso picassoAuthenticated;
 
     @Override
     public void onCreate() {
@@ -91,6 +93,7 @@ public class PushNotificationHandler extends FirebaseMessagingService {
     }
 
     private void avatarUpdatedForUser(String userId) {
+        picassoAuthenticated.invalidate(URLs.PROFILE_PICTURE_URL + userId);
         Intent intent = new Intent();
         intent.putExtra(
                 "userId",
@@ -111,6 +114,6 @@ public class PushNotificationHandler extends FirebaseMessagingService {
     }
 
     private void allMessageReadForRoom(String roomId) {
-        notificationMaster.readAllChatsInRoom(roomId,false);
+        notificationMaster.readAllChatsInRoom(roomId, false);
     }
 }
