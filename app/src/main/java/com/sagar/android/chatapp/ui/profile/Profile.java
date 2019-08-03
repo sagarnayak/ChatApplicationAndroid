@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -94,17 +95,15 @@ public class Profile extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this, viewModelProvider)
                 .get(ProfileViewModel.class);
 
-        bindToViewModel();
-
         setUpUI();
-
-        viewModel.shouldClearCacheForAvatar();
 
         IntentFilter intentFilter = new IntentFilter("AvatarUpdated");
         registerReceiver(
                 receiver,
                 intentFilter
         );
+
+        bindToViewModel();
     }
 
     @Override
@@ -276,6 +275,11 @@ public class Profile extends AppCompatActivity {
                                 processShouldClearCacheForAvatarResult(result.getContent());
                         }
                 );
+
+        new Handler().postDelayed(
+                () -> viewModel.shouldClearCacheForAvatar(),
+                500
+        );
     }
 
     private void sendPictureToServer(File file) {

@@ -22,7 +22,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.sagar.android.chatapp.util.CustomImageView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/appcompatImageViewUserImage"
             android:layout_width="80dp"
             android:layout_height="0dp"

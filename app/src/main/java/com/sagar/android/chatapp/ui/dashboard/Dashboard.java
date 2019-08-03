@@ -170,8 +170,10 @@ public class Dashboard extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home)
+        if (item.getItemId() == android.R.id.home) {
+            setAvatarToUI(false);
             binding.drawerLayout.openDrawer(GravityCompat.START);
+        }
         if (item.getItemId() == R.id.action_search) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 circleReveal(R.id.searchToolbar, 1, true, true);

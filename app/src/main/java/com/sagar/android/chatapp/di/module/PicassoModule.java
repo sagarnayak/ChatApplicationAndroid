@@ -41,8 +41,8 @@ public class PicassoModule {
                         )
                 )
                 .build();
-        picasso.setLoggingEnabled(true);
-        picasso.setIndicatorsEnabled(true);
+//        picasso.setLoggingEnabled(true);
+//        picasso.setIndicatorsEnabled(true);
 
         return picasso;
     }
